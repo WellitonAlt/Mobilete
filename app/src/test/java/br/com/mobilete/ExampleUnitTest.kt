@@ -1,4 +1,4 @@
-package br.com.mobilete.mobilete
+package br.com.mobilete
 
 import org.junit.Test
 

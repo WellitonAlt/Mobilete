@@ -1,7 +1,8 @@
-package br.com.mobilete.mobilete
+package br.com.mobilete
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import br.com.mobilete.R
 
 class MainActivity : AppCompatActivity() {
 
