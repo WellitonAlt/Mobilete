@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Mobilete</string>
+    <string name="facebook_app_id">182271082687589</string>
+    <string name="fb_login_protocol_scheme">fb182271082687589</string>
+    <string name="mobilete_logo">Mobilete Logo</string>
+    <string name="nome">Nome</string>
+    <string name="telefone">Telefone</string>
+    <string name="email">E-mail</string>
+    <string name="senha">Senha</string>
+    <string name="login">Login</string>
 </resources>
