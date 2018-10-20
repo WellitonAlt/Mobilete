@@ -45,6 +45,9 @@ dependencies {
 
     implementation 'com.github.dmytrodanylyk.android-process-button:library:1.0.0'
 
+    // Material-ish Progress
+    implementation 'com.pnikosis:materialish-progress:1.7'
+
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
 }

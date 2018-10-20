@@ -4,8 +4,9 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
-import android.widget.Toast
+import android.widget.LinearLayout
 import com.facebook.*
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
@@ -14,6 +15,7 @@ import com.google.firebase.auth.FacebookAuthProvider
 import java.util.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
 
@@ -39,15 +41,20 @@ class LoginActivity : AppCompatActivity() {
         val btnFbLogin = findViewById<Button>(R.id.btnFbLogin)
 
         btnFbLogin.setOnClickListener {
+            progressWheel(true)
             logaFb()
+        }
+
+        btnLogin.setOnClickListener{
+            progressWheel(true)
         }
     }
 
     public override fun onStart() {
         super.onStart()
         //Se já existir um usuario logado
-        //if (mAuth?.currentUser != null)
-          //  goToMainActivity(mAuth?.currentUser)
+        if (mAuth?.currentUser != null)
+           goToMainActivity(mAuth?.currentUser)
     }
 
     private fun goToMainActivity(user: FirebaseUser?){
@@ -68,6 +75,7 @@ class LoginActivity : AppCompatActivity() {
                     goToMainActivity(user)
                 } else {
                     Log.d(TAG, "signInWithCredential:failure", task.exception)
+                    progressWheel(false)
                 }
             }
     }
@@ -85,11 +93,12 @@ class LoginActivity : AppCompatActivity() {
 
                 override fun onCancel() {
                     Log.d(TAG, "Facebook onCancel.")
-
+                    progressWheel(false)
                 }
 
                 override fun onError(error: FacebookException) {
                     Log.d(TAG, "Facebook onError. $error")
+                    progressWheel(false)
                 }
             })
     }
@@ -98,4 +107,23 @@ class LoginActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         mCallbackManager!!.onActivityResult(requestCode, resultCode, data)
     }
+
+    private fun progressWheel(habilita: Boolean){
+        val linearProgress = findViewById<LinearLayout>(R.id.linearProgress)
+        val linearForm = findViewById<LinearLayout>(R.id.linearForm)
+        val btnFbLogin = findViewById<LoginButton>(R.id.btnFbLogin)
+
+        if (habilita) {
+            linearProgress.visibility = View.VISIBLE
+            linearForm.visibility = View.INVISIBLE
+            btnFbLogin.visibility = View.INVISIBLE
+            linearProgress.bringToFront()
+        }else{
+            linearProgress.visibility = View.GONE
+            linearForm.visibility = View.VISIBLE
+            btnFbLogin.visibility = View.VISIBLE
+        }
+
+    }
 }
+
