@@ -3,43 +3,53 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="match_parent" xmlns:custom="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical"
-        tools:context=".LoginActivity">
-
+        tools:context=".LoginActivity"
+        android:background="@mipmap/fundo">
 
         <ImageView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_gravity="center"
-                android:layout_margin="40dp"
-                android:src="@drawable/logo"
-                android:contentDescription="@string/mobilete_logo"/>
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:src="@drawable/logo"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/mobilete_logo"/>
 
-        <GridLayout
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="16dp"
-                android:columnCount="2">
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical"
+                android:background="@drawable/trans_retangulo">
 
-                <ImageView
-                        android:id="@+id/imgEmail"
-                        style="@style/FormImageView"
-                        android:contentDescription="@string/email"
-                        android:src="@drawable/ic_email_grey_24dp"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="@string/login"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="16dp"
+                        android:textColor="@android:color/white"
+                        android:textSize="25sp"
+                        android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/inf_email_senha"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"/>
 
                 <EditText
                         android:id="@+id/edtEmail"
                         style="@style/FormEditText"
                         android:inputType="textEmailAddress"
                         android:hint="@string/email"
-                        android:autofillHints="@string/email"/>
-
-                <ImageView
-                        android:id="@+id/imgSenha"
-                        style="@style/FormImageView"
-                        android:contentDescription="@string/senha"
-                        android:src="@drawable/ic_key_grey_24dp"/>
+                        android:autofillHints="@string/email"
+                        android:drawableLeft="@drawable/ic_email_grey_24dp"/>
 
                 <EditText
                         android:id="@+id/edtSenha"
@@ -47,25 +57,42 @@
                         android:inputType="textPassword"
                         android:hint="@string/senha"
                         android:imeOptions="actionDone"
-                        android:autofillHints="@string/senha"/>
+                        android:autofillHints="@string/senha"
+                        android:drawableLeft="@drawable/ic_key_grey_24dp"/>
 
-        </GridLayout>
+                <com.dd.processbutton.FlatButton
+                        android:id="@+id/btnLogin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/login"
+                        android:textColor="@android:color/white"
+                        custom:pb_colorNormal="@color/colorPrimaryDark"
+                        custom:pb_colorPressed="@color/colorPrimary"/>
 
-        <com.gc.materialdesign.views.ButtonRectangle
-                android:id="@+id/btnLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:background="@color/colorPrimaryDark"
-                android:text="@string/login" />
+            <TextView
+                    android:id="@+id/txtCadastrar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/cadastrase"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp" tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
 
 
         <com.facebook.login.widget.LoginButton
                 android:id="@+id/btnFbLogin"
+                android:text="Facebook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="30dp" />
+                android:layout_marginTop="16dp" />
 
 
 </LinearLayout>

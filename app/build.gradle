@@ -43,6 +43,8 @@ dependencies {
     // Material Design Android Library
     implementation 'com.github.navasmdc:MaterialDesign:1.5@aar'
 
+    implementation 'com.github.dmytrodanylyk.android-process-button:library:1.0.0'
+
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
 }
