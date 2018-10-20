@@ -10,4 +10,6 @@
     <string name="login">Login</string>
     <string name="inf_email_senha">Informe E-mail e Senha para continuar</string>
     <string name="cadastrase">Cadastre-se</string>
+    <string name="alterar_foto">Alterar foto</string>
+    <string name="cadastrar">Cadastrar</string>
 </resources>

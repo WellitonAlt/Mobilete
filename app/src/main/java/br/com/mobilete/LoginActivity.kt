@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.Toast
 import com.facebook.*
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
@@ -32,13 +33,9 @@ class LoginActivity : AppCompatActivity() {
         FacebookSdk.sdkInitialize(applicationContext)
         setContentView(R.layout.activity_login)
 
-        // Inicializa o Firebase Auth
-        mAuth = FirebaseAuth.getInstance()
 
-
-        // Inicializa Botao do Facebook
-        mCallbackManager = CallbackManager.Factory.create()
-        val btnFbLogin = findViewById<Button>(R.id.btnFbLogin)
+        mAuth = FirebaseAuth.getInstance() // Inicializa o Firebase Auth
+        mCallbackManager = CallbackManager.Factory.create() // Inicio o CallBack
 
         btnFbLogin.setOnClickListener {
             progressWheel(true)
@@ -46,15 +43,22 @@ class LoginActivity : AppCompatActivity() {
         }
 
         btnLogin.setOnClickListener{
+            //progressWheel(true)
+        }
+
+        txtCadastrar.setOnClickListener{
             progressWheel(true)
+            val goToCadastro= Intent(this, CadastroUsuarioActivity::class.java)
+            startActivity(goToCadastro)
+            finish()
         }
     }
 
     public override fun onStart() {
         super.onStart()
         //Se já existir um usuario logado
-        if (mAuth?.currentUser != null)
-           goToMainActivity(mAuth?.currentUser)
+        //if (mAuth?.currentUser != null)
+          // goToMainActivity(mAuth?.currentUser)
     }
 
     private fun goToMainActivity(user: FirebaseUser?){
@@ -94,11 +98,15 @@ class LoginActivity : AppCompatActivity() {
                 override fun onCancel() {
                     Log.d(TAG, "Facebook onCancel.")
                     progressWheel(false)
+                    Toast.makeText(this@LoginActivity, "Autenticação pelo Facebook falhou!!",
+                        Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onError(error: FacebookException) {
                     Log.d(TAG, "Facebook onError. $error")
                     progressWheel(false)
+                    Toast.makeText(this@LoginActivity, "Autenticação pelo Facebook falhou!!",
+                        Toast.LENGTH_SHORT).show()
                 }
             })
     }
@@ -109,10 +117,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun progressWheel(habilita: Boolean){
-        val linearProgress = findViewById<LinearLayout>(R.id.linearProgress)
-        val linearForm = findViewById<LinearLayout>(R.id.linearForm)
-        val btnFbLogin = findViewById<LoginButton>(R.id.btnFbLogin)
-
         if (habilita) {
             linearProgress.visibility = View.VISIBLE
             linearForm.visibility = View.INVISIBLE

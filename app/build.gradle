@@ -36,6 +36,7 @@ dependencies {
     //Firebase
     implementation 'com.google.firebase:firebase-core:16.0.4'
     implementation 'com.google.firebase:firebase-auth:16.0.5'
+    implementation 'com.google.firebase:firebase-database:16.0.3'
 
     //Facebook SDK
     implementation 'com.facebook.android:facebook-android-sdk:4.17.0'
@@ -48,6 +49,8 @@ dependencies {
     // Material-ish Progress
     implementation 'com.pnikosis:materialish-progress:1.7'
 
+    //Glide Transformations
+    implementation 'jp.wasabeef:glide-transformations:3.3.0'
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
 }
