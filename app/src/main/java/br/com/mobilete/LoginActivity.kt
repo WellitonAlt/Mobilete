@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -21,7 +22,8 @@ import kotlinx.android.synthetic.main.activity_login.*
 class LoginActivity : AppCompatActivity() {
 
     companion object {
-        const val TAG: String = "LoginFacebook"
+        const val TAG_FB: String = "Login - Facebook"
+        const val TAG_EMAIL_SENHA: String = "Login - Email Senha"
         const val USUARIO: String = "Usuario"
     }
 
@@ -43,7 +45,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         btnLogin.setOnClickListener{
-            //progressWheel(true)
+            progressWheel(true)
+            logaEmailSenha()
         }
 
         txtCadastrar.setOnClickListener{
@@ -57,28 +60,29 @@ class LoginActivity : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         //Se já existir um usuario logado
-        //if (mAuth?.currentUser != null)
-          // goToMainActivity(mAuth?.currentUser)
+        if (mAuth?.currentUser != null) {
+            goToMainActivity(mAuth?.currentUser)
+            finish()
+        }
     }
 
-    private fun goToMainActivity(user: FirebaseUser?){
+    private fun goToMainActivity(fireUser: FirebaseUser?){
         val goToMain= Intent(this, MainActivity::class.java)
-        goToMain.putExtra(USUARIO, user)
+        goToMain.putExtra(USUARIO, fireUser)
         startActivity(goToMain)
         finish()
     }
 
     private fun handleFacebookAccessToken(token: AccessToken) {
-        Log.d(TAG, "handleFacebookAccessToken: $token")
+        Log.d(TAG_EMAIL_SENHA, "handleFacebookAccessToken: $token")
         val credential = FacebookAuthProvider.getCredential(token.token)
         mAuth!!.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Log.d(TAG, "signInWithCredential:success")
-                    var user = mAuth!!.currentUser
-                    goToMainActivity(user)
+                    Log.d(TAG_FB, "Sucesso")
+                    goToMainActivity(mAuth!!.currentUser)
                 } else {
-                    Log.d(TAG, "signInWithCredential:failure", task.exception)
+                    Log.d(TAG_EMAIL_SENHA, "Falhou", task.exception)
                     progressWheel(false)
                 }
             }
@@ -91,19 +95,19 @@ class LoginActivity : AppCompatActivity() {
         LoginManager.getInstance().registerCallback(mCallbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
-                    Log.d(TAG, "Facebook token: $loginResult.accessToken.token")
+                    Log.d(TAG_FB, "Facebook token: $loginResult.accessToken.token")
                     handleFacebookAccessToken(loginResult.accessToken)
                 }
 
                 override fun onCancel() {
-                    Log.d(TAG, "Facebook onCancel.")
+                    Log.d(TAG_FB, "Facebook onCancel.")
                     progressWheel(false)
                     Toast.makeText(this@LoginActivity, "Autenticação pelo Facebook falhou!!",
                         Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onError(error: FacebookException) {
-                    Log.d(TAG, "Facebook onError. $error")
+                    Log.d(TAG_FB, "Facebook onError. $error")
                     progressWheel(false)
                     Toast.makeText(this@LoginActivity, "Autenticação pelo Facebook falhou!!",
                         Toast.LENGTH_SHORT).show()
@@ -111,23 +115,73 @@ class LoginActivity : AppCompatActivity() {
             })
     }
 
+    private fun logaEmailSenha(){
+        if(validaCampos()){
+            mAuth!!.signInWithEmailAndPassword(edtEmail.text.toString(), edtSenha.text.toString())
+                .addOnCompleteListener(this){ task ->
+                    if(task.isSuccessful){
+                        Log.d(TAG_EMAIL_SENHA, "Sucesso")
+                        goToMainActivity(mAuth!!.currentUser)
+                    }else{
+                        Log.d(TAG_EMAIL_SENHA, "Falhou ${task.exception}")
+                        mensagemErro("Email ou Senha invalidos!!")
+                        progressWheel(true)
+                    }
+                }
+        }
+    }
+
+    private fun validaCampos(): Boolean {
+        if (!emailValido(edtEmail.text.toString())) {
+            mensagemErro("O campo email está fora do padrão!!", edtEmail)
+            return false
+        }else if (edtEmail.text.isEmpty()) {
+            mensagemErro("O campo email deve conter informação!!", edtEmail)
+            return false
+        } else if (edtSenha.text.isEmpty()) {
+            mensagemErro("O campo senha deve conter informação!!", edtSenha)
+            return false
+        }
+        return true
+    }
+
+    private fun emailValido(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun mensagemErro(mensagem: String, viewFocus: View){
+        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
+        viewFocus.requestFocus()
+    }
+
+    private fun mensagemErro(mensagem: String){
+        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
+    }
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         mCallbackManager!!.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun progressWheel(habilita: Boolean){
-        if (habilita) {
+    private fun progressWheel(enabled: Boolean){
+        enableDisableView(linearForm, !enabled)
+        btnFbLogin.isEnabled = !enabled
+        if (enabled) {
             linearProgress.visibility = View.VISIBLE
-            linearForm.visibility = View.INVISIBLE
-            btnFbLogin.visibility = View.INVISIBLE
             linearProgress.bringToFront()
         }else{
             linearProgress.visibility = View.GONE
-            linearForm.visibility = View.VISIBLE
-            btnFbLogin.visibility = View.VISIBLE
         }
+    }
 
+    private fun enableDisableView(view: View, enabled: Boolean) {
+        view.isEnabled = enabled
+        if (view is ViewGroup) {
+            for (idx in 0 until view.childCount) {
+                enableDisableView(view.getChildAt(idx), enabled)
+            }
+        }
     }
 }
 
