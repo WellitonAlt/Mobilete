@@ -63,9 +63,8 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         if (validaCampos()) {
             var usuario = Usuario(edtNome.text.toString(),
                 edtEmail.text.toString(),
-                edtTelefone.text.toString(),
-                edtSenha.text.toString())
-            criaAutenticadorEmailSenha(usuario)
+                edtTelefone.text.toString())
+            criaAutenticadorEmailSenha(usuario, edtSenha.text.toString())
         }else
             progressWheel(false)
     }
@@ -108,8 +107,8 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
     }
 
-    private fun criaAutenticadorEmailSenha(usuario: Usuario){
-        mAuth!!.createUserWithEmailAndPassword(usuario.email, usuario.senha)
+    private fun criaAutenticadorEmailSenha(usuario: Usuario, senha: String){
+        mAuth!!.createUserWithEmailAndPassword(usuario.email, senha)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful()) {
                     Log.d(TAG_AUTH, "Sucesso")
@@ -194,7 +193,7 @@ class CadastroUsuarioActivity : AppCompatActivity() {
 
     private fun uploadFoto(fireUser: FirebaseUser, fotoURI: Uri) {
         val storage: FirebaseStorage = FirebaseStorage.getInstance()
-        val ref: StorageReference = storage.getReference("usuario").child("img_usuario").child(fireUser.uid)
+        val ref: StorageReference = storage.getReference("img_usuario").child(fireUser.uid)
         ref.putFile(fotoURI)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful()) {
