@@ -6,29 +6,34 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.Toast
 import com.facebook.*
 import com.facebook.login.LoginResult
-import com.facebook.login.widget.LoginButton
 import com.facebook.login.LoginManager
 import com.google.firebase.auth.FacebookAuthProvider
 import java.util.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserInfo
+import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
 
     companion object {
-        const val TAG_FB: String = "Login - Facebook"
-        const val TAG_EMAIL_SENHA: String = "Login - Email Senha"
-        const val USUARIO: String = "Usuario"
+        const val TAG_FB: String = "LoginLog - Facebook"
+        const val TAG_EMAIL_SENHA: String = "LoginLog - Email Senha"
+        const val TAG_USUARIO: String = "FirebaseLog - Recupera Usuario"
+        const val TAG_PHOTO: String = "FirebaseLog - Recupera Foto"
+        const val FIREBASE: Int = 1
+        const val FACEBOOK: Int = 2
     }
 
     private var mCallbackManager: CallbackManager? = null
     private var mAuth: FirebaseAuth? = null
+    private var usuario : Usuario? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,16 +64,13 @@ class LoginActivity : AppCompatActivity() {
 
     public override fun onStart() {
         super.onStart()
-        //Se já existir um usuario logado
-        if (mAuth?.currentUser != null) {
-            goToMainActivity(mAuth?.currentUser)
-            finish()
+        if (mAuth?.currentUser != null) {  //Se já existir um usuario logado
+            goToMainActivity()
         }
     }
 
-    private fun goToMainActivity(fireUser: FirebaseUser?){
+    private fun goToMainActivity(){
         val goToMain= Intent(this, MainActivity::class.java)
-        goToMain.putExtra(USUARIO, fireUser)
         startActivity(goToMain)
         finish()
     }
@@ -80,7 +82,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG_FB, "Sucesso")
-                    goToMainActivity(mAuth!!.currentUser)
+                    getUsuario(mAuth!!.currentUser, FACEBOOK)
                 } else {
                     Log.d(TAG_EMAIL_SENHA, "Falhou", task.exception)
                     progressWheel(false)
@@ -121,11 +123,11 @@ class LoginActivity : AppCompatActivity() {
                 .addOnCompleteListener(this){ task ->
                     if(task.isSuccessful){
                         Log.d(TAG_EMAIL_SENHA, "Sucesso")
-                        goToMainActivity(mAuth!!.currentUser)
+                        getUsuario(mAuth!!.currentUser, FIREBASE)
                     }else{
                         Log.d(TAG_EMAIL_SENHA, "Falhou ${task.exception}")
                         mensagemErro("Email ou Senha invalidos!!")
-                        progressWheel(true)
+                        progressWheel(false)
                     }
                 }
         }
@@ -158,6 +160,58 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
     }
 
+    private fun getUsuario(fireUser: FirebaseUser?, provider: Int){
+        //Todo CRUD
+        val preferencias = Preferencias(this)
+        if(provider == FIREBASE) {
+            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+            val ref: DatabaseReference = database.getReference("usuario")
+
+            ref.child(fireUser!!.uid).addListenerForSingleValueEvent( //Coleta os dados do banco
+                object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            usuario = dataSnapshot.getValue(Usuario::class.java)
+                            Log.d(TAG_USUARIO, usuario.toString())
+                            preferencias.setUsuario(usuario!!)
+                            getFotoUri(fireUser.uid, preferencias)
+                        }
+                    }
+                    override fun onCancelled(dataSnapshot: DatabaseError) {
+                        Log.d(TAG_USUARIO, "Usuario não recuperado")
+                    }
+                }
+            )
+        }else if(provider == FACEBOOK){
+            var facebookUserId = ""
+            val fotoUrl: String
+            val usuario : Usuario
+            for (profile in mAuth!!.currentUser!!.providerData) { //Pega o Id do facebook
+                if (FacebookAuthProvider.PROVIDER_ID == profile.providerId) {
+                    facebookUserId = profile.uid
+                }
+            }
+            fotoUrl = "https://graph.facebook.com/$facebookUserId/picture?height=500"
+            usuario = Usuario(fireUser!!.displayName!!, fireUser.email!!, "", fotoUrl)
+            preferencias.setUsuario(usuario)
+            goToMainActivity()
+        }
+    }
+
+    private fun getFotoUri(userID: String, preferencias: Preferencias){
+        val storage: FirebaseStorage = FirebaseStorage.getInstance()
+        val ref: StorageReference = storage.getReference("img_usuario").child(userID)
+        ref.downloadUrl.addOnCompleteListener{task ->
+            if (task.isSuccessful) {
+                preferencias.setFoto(task.result.toString())
+                Log.d(TAG_PHOTO, "Deu Bom ${task.result.toString()}")
+                goToMainActivity()
+            } else {
+                Log.d(TAG_PHOTO, "Falhou ${task.exception}")
+                goToMainActivity()
+            }
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

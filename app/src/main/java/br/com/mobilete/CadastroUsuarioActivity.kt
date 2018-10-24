@@ -16,8 +16,7 @@ import android.widget.Toast
 import android.util.Log
 import android.view.ViewGroup
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
@@ -28,12 +27,12 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         const val TAG_AUTH: String = "FirebaseLog - Cria Autenticação"
         const val TAG_CAD: String = "FirebaseLog - Salva no Banco"
         const val TAG_UP: String = "FirebaseLog - Upload"
-        const val USUARIO: String = "Usuario"
         const val REQUEST_PHOTO: Int = 200
     }
 
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
+    private var usuario : Usuario? = null
 
     private var fotoURI: Uri? = null
 
@@ -61,7 +60,7 @@ class CadastroUsuarioActivity : AppCompatActivity() {
     private fun cadastraUsuaio(){
         progressWheel(true)
         if (validaCampos()) {
-            var usuario = Usuario(edtNome.text.toString(),
+            usuario = Usuario(edtNome.text.toString(),
                 edtEmail.text.toString(),
                 edtTelefone.text.toString())
             criaAutenticadorEmailSenha(usuario, edtSenha.text.toString())
@@ -93,7 +92,7 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         return true
     }
 
-    fun emailValido(email: String): Boolean {
+    private fun emailValido(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
@@ -107,10 +106,10 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
     }
 
-    private fun criaAutenticadorEmailSenha(usuario: Usuario, senha: String){
-        mAuth!!.createUserWithEmailAndPassword(usuario.email, senha)
+    private fun criaAutenticadorEmailSenha(usuario: Usuario?, senha: String){
+        mAuth!!.createUserWithEmailAndPassword(usuario!!.email, senha)
             .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful()) {
+                if (task.isSuccessful) {
                     Log.d(TAG_AUTH, "Sucesso")
                     user = mAuth!!.currentUser
                     if(fotoURI != null)
@@ -129,9 +128,9 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         val ref: DatabaseReference = database.getReference("usuario").child(fireUser.uid)
         ref.setValue(usuario)
             .addOnCompleteListener(this){ task ->
-                if (task.isSuccessful()){
+                if (task.isSuccessful){
                     Log.d(TAG_CAD, "Sucesso")
-                    goToMainActivity(user)
+                    getUsuario()
                 }else{
                     Log.d(TAG_CAD, "Falhou ${task.exception}")
                     mensagemErro("Ocorreu um erro ao salvar no banco de dados!!")
@@ -150,9 +149,8 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         }
     }
 
-    private fun goToMainActivity(user: FirebaseUser?){
+    private fun goToMainActivity(){
         val goToMain= Intent(this, MainActivity::class.java)
-        goToMain.putExtra(USUARIO, user)
         startActivity(goToMain)
         finish()
     }
@@ -196,13 +194,21 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         val ref: StorageReference = storage.getReference("img_usuario").child(fireUser.uid)
         ref.putFile(fotoURI)
             .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful()) {
+                if (task.isSuccessful) {
                     Log.d(TAG_UP, "Sucesso")
                 } else {
                     Log.d(TAG_UP, "Falhou ${task.exception}")
                     mensagemErro("Ocorreu um erro ao fazer upload da imagem!!")
                 }
             }
+    }
+
+    private fun getUsuario(){
+        val preferencias = Preferencias(this)
+        if (fotoURI != null)
+            usuario!!.foto = fotoURI.toString()
+        preferencias.setUsuario(usuario!!)
+        goToMainActivity()
     }
 
 }

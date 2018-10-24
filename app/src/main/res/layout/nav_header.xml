@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="192dp"
+              android:background="@mipmap/fundo"
+              android:padding="16dp"
+              android:theme="@style/ThemeOverlay.AppCompat.Light"
+              android:orientation="vertical">
+
+    <ImageView
+            android:id="@+id/imgPerfil"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="5dp"
+            />
+
+    <TextView
+            android:id="@+id/txtNomeNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nome"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+    <TextView
+            android:id="@+id/txtEmailNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/email"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+
+
+</LinearLayout>

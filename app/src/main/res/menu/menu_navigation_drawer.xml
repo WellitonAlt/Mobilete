@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/opCriaAnuncio"
+          android:title="@string/criar_anuncio"
+          android:icon="@drawable/ic_edit_black_24dp"/>
+
+    <item android:id="@+id/opAnuncios"
+          android:title="@string/anuncios"
+          android:icon="@drawable/ic_more_black_24dp"/>
+
+    <item android:id="@+id/opSobre"
+          android:title="@string/sobre"
+          android:icon="@drawable/ic_insert_comment_black_24dp"/>
+</menu>

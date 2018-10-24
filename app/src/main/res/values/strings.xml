@@ -13,4 +13,10 @@
     <string name="alterar_foto"> <u> Alterar foto </u> </string>
     <string name="cadastrar">Cadastrar</string>
     <string name="foto">Foto</string>
+    <string name="anuncios">Anuncios</string>
+    <string name="perfil">Perfil</string>
+    <string name="criar_anuncio">Criar Anuncio</string>
+    <string name="sobre">Sobre</string>
+    <string name="abre">Abre</string>
+    <string name="fecha">Fecha</string>
 </resources>
