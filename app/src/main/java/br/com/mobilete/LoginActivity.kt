@@ -1,11 +1,11 @@
 package br.com.mobilete
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import com.facebook.*
 import com.facebook.login.LoginResult
@@ -14,7 +14,6 @@ import com.google.firebase.auth.FacebookAuthProvider
 import java.util.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.UserInfo
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -27,13 +26,14 @@ class LoginActivity : AppCompatActivity() {
         const val TAG_EMAIL_SENHA: String = "LoginLog - Email Senha"
         const val TAG_USUARIO: String = "FirebaseLog - Recupera Usuario"
         const val TAG_PHOTO: String = "FirebaseLog - Recupera Foto"
-        const val FIREBASE: Int = 1
-        const val FACEBOOK: Int = 2
+        const val FIREBASE: String = "Firebase"
+        const val FACEBOOK: String = "Facebook"
     }
 
     private var mCallbackManager: CallbackManager? = null
     private var mAuth: FirebaseAuth? = null
-    private var usuario : Usuario? = null
+    private var usuario: Usuario? = null
+    private lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,22 +41,25 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
 
-        mAuth = FirebaseAuth.getInstance() // Inicializa o Firebase Auth
+        mAuth = FirebaseAuth.getInstance() // Inicia o Firebase Auth
         mCallbackManager = CallbackManager.Factory.create() // Inicio o CallBack
+
+        dialog = ProgressDialog(this, R.style.ProgressDialogStyle) //Inicia o Progress Dialog
+        dialog.setMessage("Carregando...")
 
         btnFbLogin.setOnClickListener {
             progressWheel(true)
             logaFb()
         }
 
-        btnLogin.setOnClickListener{
+        btnLogin.setOnClickListener {
             progressWheel(true)
             logaEmailSenha()
         }
 
-        txtCadastrar.setOnClickListener{
+        txtCadastrar.setOnClickListener {
             progressWheel(true)
-            val goToCadastro= Intent(this, CadastroUsuarioActivity::class.java)
+            val goToCadastro = Intent(this, CadastroUsuarioActivity::class.java)
             startActivity(goToCadastro)
             finish()
         }
@@ -69,14 +72,14 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun goToMainActivity(){
-        val goToMain= Intent(this, MainActivity::class.java)
+    private fun goToMainActivity() {
+        val goToMain = Intent(this, MainActivity::class.java)
         startActivity(goToMain)
         finish()
     }
 
     private fun handleFacebookAccessToken(token: AccessToken) {
-        Log.d(TAG_EMAIL_SENHA, "handleFacebookAccessToken: $token")
+        Log.d(TAG_FB, "handleFacebookAccessToken: $token")
         val credential = FacebookAuthProvider.getCredential(token.token)
         mAuth!!.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
@@ -84,7 +87,7 @@ class LoginActivity : AppCompatActivity() {
                     Log.d(TAG_FB, "Sucesso")
                     getUsuario(mAuth!!.currentUser, FACEBOOK)
                 } else {
-                    Log.d(TAG_EMAIL_SENHA, "Falhou", task.exception)
+                    Log.d(TAG_FB, "Falhou", task.exception)
                     progressWheel(false)
                 }
             }
@@ -92,8 +95,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun logaFb() {
         mCallbackManager = CallbackManager.Factory.create()
-        LoginManager.getInstance().logOut()
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends"))
+        LoginManager.getInstance()
+            .logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends"))
         LoginManager.getInstance().registerCallback(mCallbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
@@ -104,32 +107,32 @@ class LoginActivity : AppCompatActivity() {
                 override fun onCancel() {
                     Log.d(TAG_FB, "Facebook onCancel.")
                     progressWheel(false)
-                    Toast.makeText(this@LoginActivity, "Autenticação pelo Facebook falhou!!",
-                        Toast.LENGTH_SHORT).show()
+                    mensagemErro("Autenticação pelo Facebook falhou!!")
                 }
 
                 override fun onError(error: FacebookException) {
                     Log.d(TAG_FB, "Facebook onError. $error")
                     progressWheel(false)
-                    Toast.makeText(this@LoginActivity, "Autenticação pelo Facebook falhou!!",
-                        Toast.LENGTH_SHORT).show()
+                    mensagemErro("Autenticação pelo Facebook falhou!!")
                 }
             })
     }
 
-    private fun logaEmailSenha(){
-        if(validaCampos()){
+    private fun logaEmailSenha() {
+        if (validaCampos()) {
             mAuth!!.signInWithEmailAndPassword(edtEmail.text.toString(), edtSenha.text.toString())
-                .addOnCompleteListener(this){ task ->
-                    if(task.isSuccessful){
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
                         Log.d(TAG_EMAIL_SENHA, "Sucesso")
                         getUsuario(mAuth!!.currentUser, FIREBASE)
-                    }else{
+                    } else {
                         Log.d(TAG_EMAIL_SENHA, "Falhou ${task.exception}")
                         mensagemErro("Email ou Senha invalidos!!")
                         progressWheel(false)
                     }
                 }
+        } else {
+            progressWheel(false)
         }
     }
 
@@ -137,11 +140,11 @@ class LoginActivity : AppCompatActivity() {
         if (!emailValido(edtEmail.text.toString())) {
             mensagemErro("O campo email está fora do padrão!!", edtEmail)
             return false
-        }else if (edtEmail.text.isEmpty()) {
+        } else if (edtEmail.text.isEmpty()) {
             mensagemErro("O campo email deve conter informação!!", edtEmail)
             return false
         } else if (edtSenha.text.isEmpty()) {
-            mensagemErro("O campo senha deve conter informação!!", edtSenha)
+            mensagemErro("O campo senha não pode ser vazio!!", edtSenha)
             return false
         }
         return true
@@ -151,19 +154,18 @@ class LoginActivity : AppCompatActivity() {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    private fun mensagemErro(mensagem: String, viewFocus: View){
-        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
-        viewFocus.requestFocus()
+    private fun mensagemErro(mensagem: String, edtText: EditText) {
+        edtText.error = mensagem
+        edtText.requestFocus()
     }
 
-    private fun mensagemErro(mensagem: String){
+    private fun mensagemErro(mensagem: String) {
         Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
     }
 
-    private fun getUsuario(fireUser: FirebaseUser?, provider: Int){
-        //Todo CRUD
+    private fun getUsuario(fireUser: FirebaseUser?, provider: String) {
         val preferencias = Preferencias(this)
-        if(provider == FIREBASE) {
+        if (provider == FIREBASE) {
             val database: FirebaseDatabase = FirebaseDatabase.getInstance()
             val ref: DatabaseReference = database.getReference("usuario")
 
@@ -177,15 +179,16 @@ class LoginActivity : AppCompatActivity() {
                             getFotoUri(fireUser.uid, preferencias)
                         }
                     }
+
                     override fun onCancelled(dataSnapshot: DatabaseError) {
                         Log.d(TAG_USUARIO, "Usuario não recuperado")
                     }
                 }
             )
-        }else if(provider == FACEBOOK){
+        } else if (provider == FACEBOOK) {
             var facebookUserId = ""
             val fotoUrl: String
-            val usuario : Usuario
+            val usuario: Usuario
             for (profile in mAuth!!.currentUser!!.providerData) { //Pega o Id do facebook
                 if (FacebookAuthProvider.PROVIDER_ID == profile.providerId) {
                     facebookUserId = profile.uid
@@ -194,14 +197,16 @@ class LoginActivity : AppCompatActivity() {
             fotoUrl = "https://graph.facebook.com/$facebookUserId/picture?height=500"
             usuario = Usuario(fireUser!!.displayName!!, fireUser.email!!, "", fotoUrl)
             preferencias.setUsuario(usuario)
+            preferencias.setProvider(FACEBOOK)
+            Log.d(TAG_FB, "getUsuario")
             goToMainActivity()
         }
     }
 
-    private fun getFotoUri(userID: String, preferencias: Preferencias){
+    private fun getFotoUri(userID: String, preferencias: Preferencias) {
         val storage: FirebaseStorage = FirebaseStorage.getInstance()
         val ref: StorageReference = storage.getReference("img_usuario").child(userID)
-        ref.downloadUrl.addOnCompleteListener{task ->
+        ref.downloadUrl.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 preferencias.setFoto(task.result.toString())
                 Log.d(TAG_PHOTO, "Deu Bom ${task.result.toString()}")
@@ -218,24 +223,11 @@ class LoginActivity : AppCompatActivity() {
         mCallbackManager!!.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun progressWheel(enabled: Boolean){
-        enableDisableView(linearForm, !enabled)
-        btnFbLogin.isEnabled = !enabled
-        if (enabled) {
-            linearProgress.visibility = View.VISIBLE
-            linearProgress.bringToFront()
-        }else{
-            linearProgress.visibility = View.GONE
-        }
-    }
-
-    private fun enableDisableView(view: View, enabled: Boolean) {
-        view.isEnabled = enabled
-        if (view is ViewGroup) {
-            for (idx in 0 until view.childCount) {
-                enableDisableView(view.getChildAt(idx), enabled)
-            }
-        }
+    private fun progressWheel(enabled: Boolean) {
+        if (enabled)
+            dialog.show()
+        else
+            dialog.dismiss()
     }
 }
 

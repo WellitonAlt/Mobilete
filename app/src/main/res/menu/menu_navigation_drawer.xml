@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/opCriaAnuncio"
-          android:title="@string/criar_anuncio"
-          android:icon="@drawable/ic_edit_black_24dp"/>
 
-    <item android:id="@+id/opAnuncios"
-          android:title="@string/anuncios"
-          android:icon="@drawable/ic_more_black_24dp"/>
+    <group android:id="@+id/grpPrincipal"
+           android:checkableBehavior="none" >
+        <item android:id="@+id/opCriaAnuncio"
+              android:title="@string/criar_anuncio"
+              android:icon="@drawable/ic_edit_black_24dp"/>
 
-    <item android:id="@+id/opSobre"
-          android:title="@string/sobre"
-          android:icon="@drawable/ic_insert_comment_black_24dp"/>
+        <item android:id="@+id/opAnuncios"
+              android:title="@string/anuncios"
+              android:icon="@drawable/ic_more_black_24dp"/>
+
+        <item android:id="@+id/opSobre"
+              android:title="@string/sobre"
+              android:icon="@drawable/ic_insert_comment_black_24dp"/>
+    </group>
+
+    <group android:id="@+id/grpSecundario"
+           android:checkableBehavior="none">
+        <item android:id="@+id/opSair"
+              android:title="@string/sair"
+              android:icon="@drawable/ic_exit_black_24dp" />
+    </group>
 </menu>

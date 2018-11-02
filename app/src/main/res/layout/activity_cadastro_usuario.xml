@@ -82,14 +82,5 @@
             custom:pb_colorNormal="@color/colorPrimaryDark"
             custom:pb_colorPressed="@color/colorPrimary"/>
 
-    <com.pnikosis.materialishprogress.ProgressWheel
-            android:id="@+id/progress_wheel"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:visibility="gone"
-            android:layout_gravity="center"
-            custom:matProg_barColor="@color/colorPrimary"
-            custom:matProg_progressIndeterminate="true" />
-
 
 </LinearLayout>

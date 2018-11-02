@@ -19,4 +19,8 @@
     <string name="sobre">Sobre</string>
     <string name="abre">Abre</string>
     <string name="fecha">Fecha</string>
+    <string name="sair">Sair</string>
+    <string name="com_facebook_loginview_log_out_button">Sair</string>
+    <string name="com_facebook_loginview_log_in_button">Entra Anta</string>
+    <string name="com_facebook_loginview_log_in_button_long">Entra com o Facebook Anta</string>
 </resources>

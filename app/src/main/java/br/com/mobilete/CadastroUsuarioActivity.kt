@@ -1,6 +1,7 @@
 package br.com.mobilete
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
@@ -14,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_cadastro_usuario.*
 import android.widget.Toast
 import android.util.Log
-import android.view.ViewGroup
+import android.widget.EditText
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
@@ -33,8 +34,8 @@ class CadastroUsuarioActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
     private var usuario : Usuario? = null
-
     private var fotoURI: Uri? = null
+    private lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,9 @@ class CadastroUsuarioActivity : AppCompatActivity() {
 
         //Firebase
         mAuth = FirebaseAuth.getInstance()
+
+        dialog = ProgressDialog(this, R.style.ProgressDialogStyle) //Inicia o Progress Dialog
+        dialog.setMessage("Salvando...")
 
         Glide.with(this)
             .load(R.drawable.person)
@@ -97,9 +101,9 @@ class CadastroUsuarioActivity : AppCompatActivity() {
     }
 
 
-    private fun mensagemErro(mensagem: String, viewFocus: View){
-        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
-        viewFocus.requestFocus()
+    private fun mensagemErro(mensagem: String, editText: EditText){
+        editText.error =mensagem
+        editText.requestFocus()
     }
 
     private fun mensagemErro(mensagem: String){
@@ -155,25 +159,11 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun progressWheel(enabled: Boolean){
-        enableDisableView(linearForm, !enabled)
-        if (enabled) {
-            btnCadastrar.visibility = View.GONE
-            progress_wheel.visibility = View.VISIBLE
-        }else{
-            btnCadastrar.visibility = View.VISIBLE
-            progress_wheel.visibility = View.GONE
-        }
-
-    }
-
-    private fun enableDisableView(view: View, enabled: Boolean) {
-        view.isEnabled = enabled
-        if (view is ViewGroup) {
-            for (idx in 0 until view.childCount) {
-                enableDisableView(view.getChildAt(idx), enabled)
-            }
-        }
+    private fun progressWheel(enabled: Boolean) {
+        if (enabled)
+            dialog.show()
+        else
+            dialog.dismiss()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

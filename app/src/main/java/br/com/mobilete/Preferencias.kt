@@ -10,6 +10,7 @@ class Preferencias(context: Context) {
         const val PRE_EMAIL: String = "Email"
         const val PRE_TELEFONE: String = "Telefone"
         const val PRE_FOTO: String = "Foto"
+        const val PRE_PROVIDER: String = "Provider"
     }
 
     val preferencias = context.getSharedPreferences(PREFERENCIAS, 0) //MODE_PRIVATE
@@ -52,6 +53,16 @@ class Preferencias(context: Context) {
     fun setFoto(foto: String) {
         val editor = preferencias.edit()
         editor.putString(PRE_FOTO, foto)
+        editor.apply()
+    }
+
+    fun getProvider() : String?{
+        return preferencias.getString(PRE_PROVIDER, "Firebase")
+    }
+
+    fun setProvider(provider: String) {
+        val editor = preferencias.edit()
+        editor.putString(PRE_PROVIDER, provider)
         editor.apply()
     }
 

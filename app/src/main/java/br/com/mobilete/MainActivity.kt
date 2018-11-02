@@ -1,5 +1,6 @@
 package br.com.mobilete
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -10,8 +11,13 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import br.com.mobilete.LoginActivity.Companion.FACEBOOK
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.facebook.FacebookSdk
+import com.facebook.login.LoginManager
+import com.google.firebase.auth.FacebookAuthProvider
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +26,8 @@ class MainActivity : AppCompatActivity() {
         ActionBarDrawerToggle(this, drawerLayout, R.string.abre, R.string.fecha)
     }
 
+    private var mAuth: FirebaseAuth? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -27,6 +35,8 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val preferencias = Preferencias(this)
 
         navigationView.setNavigationItemSelectedListener {
             when {
@@ -42,11 +52,19 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Sobre", Toast.LENGTH_SHORT).show()
                     true
                 }
+                it.itemId == R.id.opSair -> {
+                    FirebaseAuth.getInstance().signOut()
+                    //Logout pelo Facebook tambem
+                    if(preferencias.getProvider() == FACEBOOK)
+                        LoginManager.getInstance().logOut()
+                    goToActivity("Login")
+                    true
+                }
                 else -> false
             }
         }
 
-        val preferencias : Preferencias = Preferencias(this)
+
         val navView: NavigationView = findViewById(R.id.navigationView)
         val navHeader: View = navView.getHeaderView(0)
         val txtNome: TextView = navHeader.findViewById(R.id.txtNomeNav)
@@ -66,10 +84,12 @@ class MainActivity : AppCompatActivity() {
                .apply(RequestOptions.circleCropTransform())
                .into(imgPerfil)
         }
+    }
 
-
-
-
+    private fun goToActivity(nome: String){
+        if (nome == "Login")
+            startActivity(Intent(this, LoginActivity::class.java))
+        finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
