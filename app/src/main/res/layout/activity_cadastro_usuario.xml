@@ -12,23 +12,49 @@
         android:background="@mipmap/fundo_round">
     <requestFocus />
 
-    <ImageView
-            android:id="@+id/imgUsuario"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="40dp"
-            android:contentDescription="@string/foto"/>
+    <FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="220dp">
 
-    <TextView
-            android:id="@+id/txtAlteraFoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/alterar_foto"
-            android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
-            android:textStyle="bold"/>
+        <ImageView
+                android:id="@+id/imgUsuario"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:contentDescription="@string/foto"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionsMenu
+                android:id="@+id/btnMais"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="15dp"
+                custom:fab_addButtonColorNormal="@color/colorPrimaryDark"
+                custom:fab_addButtonColorPressed="@color/colorPrimary"
+                custom:fab_icon="@drawable/ic_add_a_photo_white_24dp"
+                custom:fab_labelsPosition="right">
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/btnFoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    custom:fab_colorNormal="@color/colorPrimaryDark"
+                    custom:fab_colorPressed="@color/colorPrimary"
+                    custom:fab_icon="@drawable/ic_add_a_photo_white_24dp"
+                    custom:fab_size="mini"/>
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/btnGaleria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    custom:fab_colorNormal="@color/colorPrimaryDark"
+                    custom:fab_colorPressed="@color/colorPrimary"
+                    custom:fab_icon="@drawable/ic_collections_black_24dp"
+                    custom:fab_size="mini"/>
+
+        </com.getbase.floatingactionbutton.FloatingActionsMenu>
+    </FrameLayout>
 
     <LinearLayout
             android:id="@+id/linearForm"

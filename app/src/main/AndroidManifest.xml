@@ -4,7 +4,11 @@
           package="br.com.mobilete">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission
+            android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+            android:maxSdkVersion="18"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
             android:allowBackup="true"
@@ -13,13 +17,27 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
+        <provider
+                android:name="android.support.v4.content.FileProvider"
+                android:authorities="br.com.mobilete.fileprovider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths"/>
+        </provider>
 
-        <activity android:name=".MainActivity" >
+        <activity android:name=".MainActivity"
+                  android:label="Mobilete">
         </activity>
 
         <meta-data
                 android:name="com.facebook.sdk.ApplicationId"
                 android:value="@string/facebook_app_id"/>
+
+        <meta-data
+                android:name="com.google.android.geo.API_KEY"
+                android:value="AIzaSyCSI878skniY0K4OdhOkKD9SPoIuDNgqGw"/>
 
         <activity
                 android:name=".LoginActivity"
@@ -32,6 +50,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
                 xmlns:tools="http://schemas.android.com/tools"
                 android:name="com.facebook.FacebookActivity"
@@ -40,15 +59,27 @@
                 tools:replace="android:theme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
+
                 <data android:scheme="@string/fb_login_protocol_scheme"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".CadastroUsuarioActivity"
-                  android:label="Mobilete - Novo Usuário">
+        <activity
+                android:name=".CadastroUsuarioActivity"
+                android:label="Mobilete - Novo Usuário">
         </activity>
-    </application>
 
+        <activity android:name=".CadastroAnuncioActivity"
+                  android:label="Mobilete - Anúncio">
+
+        </activity>
+
+        <activity android:name=".MapaActivity"
+                  android:label="Mobilete - Mapa">
+        </activity>
+
+    </application>
 </manifest>

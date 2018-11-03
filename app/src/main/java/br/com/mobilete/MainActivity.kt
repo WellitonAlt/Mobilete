@@ -14,9 +14,7 @@ import android.widget.Toast
 import br.com.mobilete.LoginActivity.Companion.FACEBOOK
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.facebook.FacebookSdk
 import com.facebook.login.LoginManager
-import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -41,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener {
             when {
                 it.itemId == R.id.opCriaAnuncio -> {
-                    Toast.makeText(this, "Cria Anuncio", Toast.LENGTH_SHORT).show()
+                    goToActivity("Anuncio")
                     true
                 }
                 it.itemId == R.id.opAnuncios -> {
@@ -64,7 +62,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
         val navView: NavigationView = findViewById(R.id.navigationView)
         val navHeader: View = navView.getHeaderView(0)
         val txtNome: TextView = navHeader.findViewById(R.id.txtNomeNav)
@@ -73,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         txtNome.text = preferencias.getNome()
         txtEmail.text = preferencias.getEmail()
 
-        if (preferencias.getFoto() != null){
+        if (preferencias.getFoto() != ""){
             Glide.with(this)
               .load(preferencias.getFoto())
               .apply(RequestOptions.circleCropTransform())
@@ -87,9 +84,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToActivity(nome: String){
-        if (nome == "Login")
+        if (nome == "Login") {
             startActivity(Intent(this, LoginActivity::class.java))
-        finish()
+            finish()
+        }
+        else if (nome == "Anuncio"){
+            startActivity(Intent(this, CadastroAnuncioActivity::class.java))
+        }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

@@ -58,10 +58,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         txtCadastrar.setOnClickListener {
-            progressWheel(true)
             val goToCadastro = Intent(this, CadastroUsuarioActivity::class.java)
             startActivity(goToCadastro)
-            finish()
         }
     }
 

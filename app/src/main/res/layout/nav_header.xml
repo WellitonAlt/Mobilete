@@ -5,9 +5,11 @@
               android:background="@drawable/nav_fundo"
               android:padding="16dp"
               android:theme="@style/ThemeOverlay.AppCompat.Light"
-              android:orientation="vertical">
+              android:orientation="vertical"
+              android:gravity="bottom">
 
-    <ImageView
+
+<ImageView
             android:id="@+id/imgPerfil"
             android:layout_width="100dp"
             android:layout_height="100dp"
@@ -30,7 +32,5 @@
             android:text="@string/email"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
-
-
 
 </LinearLayout>
