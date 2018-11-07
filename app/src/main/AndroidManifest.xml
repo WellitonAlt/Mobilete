@@ -27,14 +27,14 @@
                     android:resource="@xml/file_paths"/>
         </provider>
 
-        <activity android:name=".MainActivity"
-                  android:label="Mobilete">
+        <activity
+                android:name=".MainActivity"
+                android:label="Mobilete">
         </activity>
 
         <meta-data
                 android:name="com.facebook.sdk.ApplicationId"
                 android:value="@string/facebook_app_id"/>
-
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
                 android:value="AIzaSyCSI878skniY0K4OdhOkKD9SPoIuDNgqGw"/>
@@ -50,7 +50,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
                 xmlns:tools="http://schemas.android.com/tools"
                 android:name="com.facebook.FacebookActivity"
@@ -66,20 +65,21 @@
                 <data android:scheme="@string/fb_login_protocol_scheme"/>
             </intent-filter>
         </activity>
-
         <activity
                 android:name=".CadastroUsuarioActivity"
                 android:label="Mobilete - Novo Usuário">
         </activity>
-
-        <activity android:name=".CadastroAnuncioActivity"
-                  android:label="Mobilete - Anúncio">
-
+        <activity
+                android:name=".CadastroAnuncioActivity"
+                android:label="Mobilete - Anúncio">
         </activity>
-
-        <activity android:name=".MapaActivity"
-                  android:label="Mobilete - Mapa">
+        <activity
+                android:name=".MapaActivity"
+                android:label="Mobilete - Mapa">
         </activity>
-
+        <activity android:name=".MeusAnunciosActivity"
+                  android:label="Mobilete - Meus Anuncios">
+        </activity>
     </application>
+
 </manifest>
