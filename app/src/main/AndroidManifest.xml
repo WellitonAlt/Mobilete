@@ -28,7 +28,7 @@
         </provider>
 
         <activity android:name=".MainActivity"
-                  android:label="Mobilete">
+                    android:theme="@style/AppThemeNoActionBar">
         </activity>
 
         <meta-data

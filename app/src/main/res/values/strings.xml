@@ -35,5 +35,6 @@
     <string name="local">Local</string>
     <string name="salvar">Salvar</string>
     <string name="procurar">Procurar</string>
+    <string name="tituloApp">Mobilete</string>
 
 </resources>
