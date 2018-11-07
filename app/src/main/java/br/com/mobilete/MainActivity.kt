@@ -22,6 +22,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        private const val LOGIN: String = "Login"
+        private const val ANUNCIO: String = "Anuncio"
+        private const val MEUS_ANUNCIO: String = "MeusAnuncio"
+    }
+
     private val toggle: ActionBarDrawerToggle by lazy {
         ActionBarDrawerToggle(this, drawerLayout, R.string.abre, R.string.fecha)
     }
@@ -44,11 +50,11 @@ class MainActivity : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener {
             when {
                 it.itemId == R.id.opCriaAnuncio -> {
-                    goToActivity("Anuncio")
+                    goToActivity(ANUNCIO)
                     true
                 }
-                it.itemId == R.id.opAnuncios -> {
-                    Toast.makeText(this, "Anuncios", Toast.LENGTH_SHORT).show()
+                it.itemId == R.id.opMeusAnuncios -> {
+                    goToActivity(MEUS_ANUNCIO)
                     true
                 }
                 it.itemId == R.id.opSobre -> {
@@ -60,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                     //Logout pelo Facebook tambem
                     if(preferencias.getProvider() == FACEBOOK)
                         LoginManager.getInstance().logOut()
-                    goToActivity("Login")
+                    goToActivity(LOGIN)
                     true
                 }
                 else -> false
@@ -89,12 +95,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToActivity(nome: String){
-        if (nome == "Login") {
+        if (nome == LOGIN) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
-        }
-        else if (nome == "Anuncio"){
+        }else if (nome == ANUNCIO){
             startActivity(Intent(this, CadastroAnuncioActivity::class.java))
+        }else if (nome == MEUS_ANUNCIO){
+            startActivity(Intent(this, MeusAnunciosActivity::class.java))
         }
 
     }

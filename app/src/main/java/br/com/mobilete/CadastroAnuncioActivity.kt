@@ -194,8 +194,9 @@ class CadastroAnuncioActivity : AppCompatActivity() {
 
     private fun criaAnuncio(anuncio: Anuncio){
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val ref: DatabaseReference = database.getReference("anuncios")
+        val ref: DatabaseReference = database.getReference("anuncios").child(user!!.uid)
         val key = ref.push().key
+        anuncio.foto = key!!
         ref.child(key!!).setValue(anuncio)
             .addOnCompleteListener(this){ task ->
                 if (task.isSuccessful){

@@ -8,8 +8,8 @@
               android:title="@string/criar_anuncio"
               android:icon="@drawable/ic_edit_black_24dp"/>
 
-        <item android:id="@+id/opAnuncios"
-              android:title="@string/anuncios"
+        <item android:id="@+id/opMeusAnuncios"
+              android:title="@string/meus_anuncios"
               android:icon="@drawable/ic_more_black_24dp"/>
 
         <item android:id="@+id/opSobre"
