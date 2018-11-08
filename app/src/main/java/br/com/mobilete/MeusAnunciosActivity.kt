@@ -46,6 +46,7 @@ class MeusAnunciosActivity :  AppCompatActivity(){
                 adapter.removeAt(viewHolder.adapterPosition)
             }
         }
+
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }

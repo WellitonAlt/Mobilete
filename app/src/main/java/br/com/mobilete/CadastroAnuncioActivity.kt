@@ -50,22 +50,23 @@ class CadastroAnuncioActivity : AppCompatActivity() {
     private var user: FirebaseUser? = null
     private var loc : String? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro_anuncio)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         mAuth = FirebaseAuth.getInstance()
         user = mAuth!!.currentUser
+
         calendario = Calendar.getInstance()
+
+        dialog = ProgressDialog(this, R.style.ProgressDialogStyle) //Inicia o Progress Dialog
+        dialog.setMessage("Salvando...")
 
         val ano = calendario.get(Calendar.YEAR)
         val mes = calendario.get(Calendar.MONTH)
         val dia = calendario.get(Calendar.DAY_OF_MONTH)
-
-        dialog = ProgressDialog(this, R.style.ProgressDialogStyle) //Inicia o Progress Dialog
-        dialog.setMessage("Salvando...")
 
         Glide.with(this)
             .load(R.drawable.food)
@@ -187,21 +188,53 @@ class CadastroAnuncioActivity : AppCompatActivity() {
                 txtValidade.text.toString(),
                 edtValor.text.toString(),
                 loc!!)
-            criaAnuncio(anuncio!!)
+            getKey()
         }else
             progressWheel(false)
     }
 
-    private fun criaAnuncio(anuncio: Anuncio){
+    private fun getKey(){
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
         val ref: DatabaseReference = database.getReference("anuncios").child(user!!.uid)
         val key = ref.push().key
-        anuncio.foto = key!!
+        uploadFoto(key!!, ref)
+
+    }
+
+    private fun uploadFoto(key: String, dataBaseRef: DatabaseReference) {
+        val storage: FirebaseStorage = FirebaseStorage.getInstance()
+        val ref: StorageReference = storage.getReference("img_anuncio").child(key)
+        ref.putFile(fotoAceita!!)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG_UP, "Sucesso")
+                    getStorageUrl(key, dataBaseRef, ref)
+                } else {
+                    Log.d(TAG_UP, "Falhou ${task.exception}")
+                    mensagemErro("Ocorreu um erro ao fazer upload da imagem!!")
+                }
+            }
+    }
+
+    private fun getStorageUrl(key: String, dataBaseRef: DatabaseReference, storageRef: StorageReference){
+       storageRef.downloadUrl.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG_UP, "URL Sucesso")
+                anuncio!!.foto = task.result.toString()
+                salvaAnuncio(key, dataBaseRef)
+            } else {
+                Log.d(TAG_UP, "Falhou ${task.exception}")
+            }
+        }
+    }
+
+    private fun salvaAnuncio(key: String, ref: DatabaseReference){
         ref.child(key!!).setValue(anuncio)
             .addOnCompleteListener(this){ task ->
                 if (task.isSuccessful){
-                    Log.d(TAG_CAD, "Sucesso ${key}")
-                    uploadFoto(key)
+                    Log.d(TAG_CAD, "Sucesso $key")
+                    mensagemErro("Anuncio salvo com sucesso")
+                    limpaCampos()
                 }else{
                     Log.d(TAG_CAD, "Falhou ${task.exception}")
                     mensagemErro("Ocorreu um erro ao salvar no banco de dados!!")
@@ -210,26 +243,11 @@ class CadastroAnuncioActivity : AppCompatActivity() {
             }
     }
 
-    private fun uploadFoto(key: String) {
-        val storage: FirebaseStorage = FirebaseStorage.getInstance()
-        val ref: StorageReference = storage.getReference("img_anuncio").child(key)
-        ref.putFile(fotoAceita!!)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG_UP, "Sucesso")
-                    mensagemErro("Salvo com sucesso")
-                    limpaCampos()
-                } else {
-                    Log.d(TAG_UP, "Falhou ${task.exception}")
-                    mensagemErro("Ocorreu um erro ao fazer upload da imagem!!")
-                }
-            }
-    }
-
     private fun validaCampos(): Boolean {
 
         val dataAtual = java.util.Date()
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm")
+
         if (fotoAceita == null){
             mensagemErro("Uma foto deve ser selecionada!!")
             return false
@@ -259,7 +277,7 @@ class CadastroAnuncioActivity : AppCompatActivity() {
     }
 
     private fun mensagemErro(mensagem: String, editText: EditText){
-        editText.error =mensagem
+        editText.error = mensagem
         editText.requestFocus()
     }
 

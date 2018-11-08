@@ -28,10 +28,8 @@
         </provider>
 
         <activity android:name=".MainActivity"
-                    android:theme="@style/AppThemeNoActionBar">
-        <activity
-                android:name=".MainActivity"
-                android:label="Mobilete">
+                  android:theme="@style/AppThemeNoActionBar"
+                  android:label="Mobilete">
         </activity>
 
         <meta-data

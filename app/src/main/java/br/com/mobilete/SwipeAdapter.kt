@@ -39,23 +39,9 @@ class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapt
             txtDescricao.text = anuncio.descricao
             txtValidade.text = anuncio.validade
             Glide.with(this)
-                .load(R.drawable.food)
+                .load(anuncio.foto)
                 .apply(RequestOptions.circleCropTransform())
                 .into(imgFoto)
-
-            val storage: FirebaseStorage = FirebaseStorage.getInstance()
-            val ref: StorageReference = storage.getReference("img_anuncio").child(anuncio.foto)
-               ref.downloadUrl.addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Glide.with(this)
-                            .load(task.result.toString())
-                            .apply(RequestOptions.circleCropTransform())
-                            .into(imgFoto)
-                    } else {
-                        Log.d(LoginActivity.TAG_PHOTO, "Falhou ${task.exception}")
-                    }
-                }
-
         }
     }
 }
