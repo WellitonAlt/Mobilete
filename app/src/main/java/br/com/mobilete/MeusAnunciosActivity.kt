@@ -42,8 +42,18 @@ class MeusAnunciosActivity :  AppCompatActivity(){
 
         val swipeHandler = object : SwipeCallback(this) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val adapter = recyclerView.adapter as SwipeAdapter
-                adapter.removeAt(viewHolder.adapterPosition)
+                //8 Direita
+                if (direction == 8){
+                    Log.d("Direcao", "Direita")
+                    val adapter = recyclerView.adapter as SwipeAdapter
+                }else if (direction == 4){
+                    Log.d("Direcao", "Esquerda")
+                    val adapter = recyclerView.adapter as SwipeAdapter
+                    adapter.removeAt(viewHolder.adapterPosition)
+                }
+
+
+
             }
         }
 
