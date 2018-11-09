@@ -77,7 +77,7 @@ class CadastroAnuncioActivity : AppCompatActivity() {
             val datePicker = DatePickerDialog(
                 this, DatePickerDialog.OnDateSetListener {
                         view, mYear, mMoth, mDay ->
-                    txtValidade.setText("$mDay/${mMoth+1}/$mYear")
+                    txtValidade.text = "$mDay/${mMoth+1}/$mYear"
             }, ano, mes, dia)
             datePicker.show()
         }
@@ -183,7 +183,9 @@ class CadastroAnuncioActivity : AppCompatActivity() {
     private fun cadastraAnuncio(){
         progressWheel(true)
         if (validaCampos()) {
-            anuncio = Anuncio(user!!.uid,
+            anuncio = Anuncio(
+                "",
+                user!!.uid,
                 edtDescricao.text.toString(),
                 txtValidade.text.toString(),
                 edtValor.text.toString(),
@@ -197,7 +199,8 @@ class CadastroAnuncioActivity : AppCompatActivity() {
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
         val ref: DatabaseReference = database.getReference("anuncios").child(user!!.uid)
         val key = ref.push().key
-        uploadFoto(key!!, ref)
+        anuncio!!.id = key!!
+        uploadFoto(key, ref)
 
     }
 
@@ -229,7 +232,7 @@ class CadastroAnuncioActivity : AppCompatActivity() {
     }
 
     private fun salvaAnuncio(key: String, ref: DatabaseReference){
-        ref.child(key!!).setValue(anuncio)
+        ref.child(key).setValue(anuncio)
             .addOnCompleteListener(this){ task ->
                 if (task.isSuccessful){
                     Log.d(TAG_CAD, "Sucesso $key")
@@ -268,7 +271,7 @@ class CadastroAnuncioActivity : AppCompatActivity() {
             return false
         }
 
-        val data: Date = dateFormat.parse("${txtValidade.text.toString()} 23:59")
+        val data: Date = dateFormat.parse("${txtValidade.text} 23:59")
         if(data <= dataAtual){
             mensagemErro("O validade não pode ser menor que a data atual!!")
             return false

@@ -3,34 +3,46 @@ package br.com.mobilete
 import android.app.ProgressDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_meus_anuncios.*
 
 class MeusAnunciosActivity :  AppCompatActivity(){
 
     companion object {
         const val TAG_ANUNCIO: String = "FirebaseLog - Recupera Anuncios"
+        const val TAG_ANUNCIO_DELETE: String = "FirebaseLog - Deleta Anuncios"
+        const val TAG_ANUNCIO_FOTO: String = "FirebaseLog - Deleta Anuncios Foto"
+        const val DELETA: String = "deleta"
+        const val TAG_ALERTA_NAO: String = "Alerta - Nao"
     }
 
     private var listaAnuncios: MutableList<Anuncio> = mutableListOf()
-    private lateinit var swipeAdapter: SwipeAdapter
+    private var database: FirebaseDatabase? = null
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
+
+    private lateinit var swipeAdapter: SwipeAdapter
     private lateinit var dialog: ProgressDialog
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_meus_anuncios)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        database = FirebaseDatabase.getInstance()
         mAuth = FirebaseAuth.getInstance()
         user = mAuth!!.currentUser
 
@@ -42,18 +54,14 @@ class MeusAnunciosActivity :  AppCompatActivity(){
 
         val swipeHandler = object : SwipeCallback(this) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = recyclerView.adapter as SwipeAdapter
                 //8 Direita
                 if (direction == 8){
                     Log.d("Direcao", "Direita")
-                    val adapter = recyclerView.adapter as SwipeAdapter
                 }else if (direction == 4){
                     Log.d("Direcao", "Esquerda")
-                    val adapter = recyclerView.adapter as SwipeAdapter
-                    adapter.removeAt(viewHolder.adapterPosition)
+                    alerta(adapter.getItem(viewHolder.adapterPosition), viewHolder.adapterPosition, DELETA)
                 }
-
-
-
             }
         }
 
@@ -71,12 +79,12 @@ class MeusAnunciosActivity :  AppCompatActivity(){
     }
 
     private fun getAnuncios(){
-        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val ref: DatabaseReference = database.getReference("anuncios").child(user!!.uid)
+        val ref: DatabaseReference = database!!.getReference("anuncios").child(user!!.uid)
 
         ref.addValueEventListener( //Coleta os dados do banco
             object : ValueEventListener  {
                 override fun onDataChange(p0: DataSnapshot) {
+                    listaAnuncios.clear()
                     p0.children.mapNotNullTo(listaAnuncios) {
                         it.getValue<Anuncio>(Anuncio::class.java)
                     }
@@ -91,6 +99,29 @@ class MeusAnunciosActivity :  AppCompatActivity(){
         )
     }
 
+    private fun deletaAnuncio(anuncio: Anuncio){
+        val refDatabase: DatabaseReference = database!!.getReference("anuncios").child(user!!.uid).child(anuncio.id)
+        val storage: FirebaseStorage = FirebaseStorage.getInstance()
+        val refDataStore: StorageReference = storage.getReference("img_anuncio").child(anuncio.id)
+        refDatabase.setValue(null).addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG_ANUNCIO_DELETE, "Sucesso")
+            } else {
+                Log.d(TAG_ANUNCIO_DELETE, "Falhou ${task.exception}")
+                mensagemErro("Ocorreu um erro ao excluir o anuncio!!")
+            }
+        }
+        refDataStore.delete().addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG_ANUNCIO_FOTO, "Sucesso")
+                mensagemErro("Anuncio removido com sucesso!!")
+            } else {
+                Log.d(TAG_ANUNCIO_FOTO, "Falhou ${task.exception}")
+                mensagemErro("Ocorreu um erro ao deletar a imagem!!")
+            }
+        }
+    }
+
     private fun listaAnuncios(){
         swipeAdapter = SwipeAdapter(listaAnuncios)
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
@@ -99,11 +130,40 @@ class MeusAnunciosActivity :  AppCompatActivity(){
         progressWheel(false)
     }
 
+    private fun mensagemErro(mensagem: String){
+        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
+    }
+
     private fun progressWheel(enabled: Boolean) {
         if (enabled)
             dialog.show()
         else
             dialog.dismiss()
+    }
+
+    private fun alerta(anuncio: Anuncio, possicao: Int, op: String){
+        val builder = AlertDialog.Builder(this@MeusAnunciosActivity)
+        val adapter = recyclerView.adapter as SwipeAdapter
+        var mensagem: String
+
+        if (op.equals(DELETA))
+            mensagem = "Deseja Deletar esse Anuncio?"
+        else
+            mensagem = "Deseja Editar esse Anuncio?"
+
+        builder.setTitle(mensagem)
+        builder.setMessage(anuncio.descricao)
+        builder.setPositiveButton("Sim"){dialog, which ->
+            if(op.equals(DELETA)) {
+                adapter.removeAt(possicao)
+                deletaAnuncio(anuncio)
+            }
+        }
+        builder.setNegativeButton("Não"){dialog,which ->
+            Log.d(TAG_ALERTA_NAO, "Nao")
+            listaAnuncios()
+        }
+        builder.create().show()
     }
 
 }

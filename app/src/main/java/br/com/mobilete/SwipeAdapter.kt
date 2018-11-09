@@ -22,6 +22,11 @@ class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapt
 
     override fun getItemCount(): Int = items.size
 
+    fun getItem(position: Int) :Anuncio {
+        val anuncio: Anuncio = items[position]
+        return anuncio
+    }
+
     fun addItem(anuncio: Anuncio) {
         items.add(anuncio)
         notifyItemInserted(items.size)
