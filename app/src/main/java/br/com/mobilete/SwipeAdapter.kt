@@ -1,5 +1,7 @@
 package br.com.mobilete
 
+import android.support.v4.content.ContextCompat
+import android.support.v4.widget.CircularProgressDrawable
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
@@ -41,10 +43,16 @@ class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapt
         LayoutInflater.from(parent.context).inflate(R.layout.meus_anuncios_lista, parent, false)) {
 
         fun bind(anuncio: Anuncio ) = with(itemView) {
+            val circularProgressDrawable = CircularProgressDrawable(itemView.context)
+            circularProgressDrawable.strokeWidth = 5f
+            circularProgressDrawable.centerRadius = 30f
+            circularProgressDrawable.start()
+
             txtDescricao.text = anuncio.descricao
             txtValidade.text = anuncio.validade
-            Glide.with(this)
+            GlideApp.with(this)
                 .load(anuncio.foto)
+                .placeholder(circularProgressDrawable)
                 .apply(RequestOptions.circleCropTransform())
                 .into(imgFoto)
         }

@@ -5,15 +5,15 @@ import android.content.Context
 class Preferencias(context: Context) {
 
     companion object {
-        const val PREFERENCIAS: String = "Preferencias Usuario"
-        const val PRE_NOME: String = "Nome"
-        const val PRE_EMAIL: String = "Email"
-        const val PRE_TELEFONE: String = "Telefone"
-        const val PRE_FOTO: String = "Foto"
-        const val PRE_PROVIDER: String = "Provider"
+        private const val PREFERENCIAS: String = "Preferencias Usuario"
+        private const val PRE_NOME: String = "Nome"
+        private const val PRE_EMAIL: String = "Email"
+        private const val PRE_TELEFONE: String = "Telefone"
+        private const val PRE_FOTO: String = "Foto"
+        private const val PRE_PROVIDER: String = "Provider"
     }
 
-    val preferencias = context.getSharedPreferences(PREFERENCIAS, 0) //MODE_PRIVATE
+    private val preferencias = context.getSharedPreferences(PREFERENCIAS, 0)
 
     fun getNome() : String?{
         return preferencias.getString(PRE_NOME, "Nome do Usuario")

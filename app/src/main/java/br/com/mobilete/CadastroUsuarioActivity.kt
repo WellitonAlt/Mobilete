@@ -1,8 +1,10 @@
 package br.com.mobilete
 
+import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +21,11 @@ import android.widget.Toast
 import android.util.Log
 import android.view.MenuItem
 import android.widget.EditText
+import br.com.mobilete.AppConstants.REQUEST_CAMERA
+import br.com.mobilete.AppConstants.REQUEST_GALERIA
+import br.com.mobilete.AppConstants.TAG_AUTH
+import br.com.mobilete.AppConstants.TAG_CAD
+import br.com.mobilete.AppConstants.TAG_UP
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
@@ -28,19 +35,9 @@ import java.io.File
 
 class CadastroUsuarioActivity : AppCompatActivity() {
 
-    companion object {
-        const val TAG_AUTH: String = "FirebaseLog - Cria Autenticação"
-        const val TAG_CAD: String = "FirebaseLog - Salva no Banco"
-        const val TAG_UP: String = "FirebaseLog - Upload"
-        const val TAG_PHOTO: String = "PhotoAceita - "
-        private const val REQUEST_CAMERA: Int = 10
-        private const val REQUEST_GALERIA: Int = 30
-    }
-
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
     private var usuario : Usuario? = null
-    private var fotoGaleria: Uri? = null
     private var fotoCamera: Uri? = null
     private var fotoAceita: Uri? = null
     private lateinit var dialog: ProgressDialog
@@ -57,21 +54,20 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         dialog = ProgressDialog(this, R.style.ProgressDialogStyle) //Inicia o Progress Dialog
         dialog.setMessage("Salvando...")
 
-        Glide.with(this)
-            .load(R.drawable.person)
-            .apply(RequestOptions.circleCropTransform())
-            .into(findViewById<View>(R.id.imgUsuario) as ImageView)
+        carregaFoto()
 
         btnCadastrar.setOnClickListener {
             cadastraUsuaio()
         }
 
         btnGaleria.setOnClickListener{
-            selecionaFoto()
+            if (readExternalPermission())
+                selecionaFoto()
         }
 
         btnFoto.setOnClickListener{
-            tiraFoto()
+            if (cameraPermission())
+                tiraFoto()
         }
 
     }
@@ -86,26 +82,19 @@ class CadastroUsuarioActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode == REQUEST_GALERIA && resultCode == Activity.RESULT_OK) {
             if (data != null){
-                fotoCamera = data.data
-                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, fotoCamera)
-                Glide.with(this)
-                    .load(bitmap)
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(findViewById<View>(R.id.imgUsuario) as ImageView)
-                fotoAceita = fotoCamera
+                fotoAceita = data.data
+                carregaFoto()
             }
         }
 
         if(requestCode == REQUEST_CAMERA && resultCode == Activity.RESULT_OK){
-            Glide.with(this)
-                .load(fotoGaleria)
-                .apply(RequestOptions.circleCropTransform())
-                .into(findViewById<View>(R.id.imgUsuario) as ImageView)
-            fotoAceita = fotoGaleria
+            fotoAceita = fotoCamera
+            carregaFoto()
         }
-        Log.d(TAG_PHOTO, fotoAceita.toString())
     }
 
     private fun cadastraUsuaio(){
@@ -226,17 +215,17 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         val diretorioArquivo = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val arquivoFoto = File.createTempFile(nomeArquivo, "jpg", diretorioArquivo)
 
-        fotoGaleria = Uri.fromFile(arquivoFoto)
+        fotoCamera = Uri.fromFile(arquivoFoto)
 
         return arquivoFoto
     }
 
     private fun selecionaFoto(){
-        val goToGaleria = Intent(Intent.ACTION_PICK,
+        val selecionaFoto = Intent(Intent.ACTION_PICK,
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
 
-        if (goToGaleria.resolveActivity(packageManager) != null) {
-            startActivityForResult(goToGaleria, REQUEST_GALERIA)
+        if (selecionaFoto.resolveActivity(packageManager) != null) {
+            startActivityForResult(selecionaFoto, REQUEST_GALERIA)
         }
     }
 
@@ -254,6 +243,30 @@ class CadastroUsuarioActivity : AppCompatActivity() {
             dialog.show()
         else
             dialog.dismiss()
+    }
+
+    private fun carregaFoto(){
+        GlideApp.with(this)
+            .load(fotoAceita)
+            .placeholder(R.drawable.person)
+            .dontAnimate()
+            .into(findViewById<View>(R.id.imgUsuario) as ImageView)
+    }
+
+    private fun readExternalPermission(): Boolean {
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), AppConstants.REQUEST_EXTERNAL)
+            return false
+        }
+        return true
+    }
+
+    private fun cameraPermission(): Boolean {
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.CAMERA), AppConstants.REQUEST_CAMERA)
+            return false
+        }
+        return true
     }
 
 }

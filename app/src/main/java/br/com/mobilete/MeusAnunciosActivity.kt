@@ -11,6 +11,10 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
+import br.com.mobilete.AppConstants.DELETE
+import br.com.mobilete.AppConstants.TAG_ANUNCIO
+import br.com.mobilete.AppConstants.TAG_ANUNCIO_DELETE
+import br.com.mobilete.AppConstants.TAG_ANUNCIO_FOTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
@@ -19,14 +23,6 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_meus_anuncios.*
 
 class MeusAnunciosActivity :  AppCompatActivity(){
-
-    companion object {
-        const val TAG_ANUNCIO: String = "FirebaseLog - Recupera Anuncios"
-        const val TAG_ANUNCIO_DELETE: String = "FirebaseLog - Deleta Anuncios"
-        const val TAG_ANUNCIO_FOTO: String = "FirebaseLog - Deleta Anuncios Foto"
-        const val DELETA: String = "deleta"
-        const val TAG_ALERTA_NAO: String = "Alerta - Nao"
-    }
 
     private var listaAnuncios: MutableList<Anuncio> = mutableListOf()
     private var database: FirebaseDatabase? = null
@@ -60,7 +56,7 @@ class MeusAnunciosActivity :  AppCompatActivity(){
                     Log.d("Direcao", "Direita")
                 }else if (direction == 4){
                     Log.d("Direcao", "Esquerda")
-                    alerta(adapter.getItem(viewHolder.adapterPosition), viewHolder.adapterPosition, DELETA)
+                    alerta(adapter.getItem(viewHolder.adapterPosition), viewHolder.adapterPosition, DELETE)
                 }
             }
         }
@@ -141,12 +137,12 @@ class MeusAnunciosActivity :  AppCompatActivity(){
             dialog.dismiss()
     }
 
-    private fun alerta(anuncio: Anuncio, possicao: Int, op: String){
+    private fun alerta(anuncio: Anuncio, possicao: Int, op: Int){
         val builder = AlertDialog.Builder(this@MeusAnunciosActivity)
         val adapter = recyclerView.adapter as SwipeAdapter
-        var mensagem: String
+        val mensagem: String
 
-        if (op.equals(DELETA))
+        if (op == DELETE)
             mensagem = "Deseja Deletar esse Anuncio?"
         else
             mensagem = "Deseja Editar esse Anuncio?"
@@ -154,13 +150,12 @@ class MeusAnunciosActivity :  AppCompatActivity(){
         builder.setTitle(mensagem)
         builder.setMessage(anuncio.descricao)
         builder.setPositiveButton("Sim"){dialog, which ->
-            if(op.equals(DELETA)) {
+            if(op == DELETE) {
                 adapter.removeAt(possicao)
                 deletaAnuncio(anuncio)
             }
         }
-        builder.setNegativeButton("Não"){dialog,which ->
-            Log.d(TAG_ALERTA_NAO, "Nao")
+        builder.setNegativeButton("Não"){dialog, which ->
             listaAnuncios()
         }
         builder.create().show()

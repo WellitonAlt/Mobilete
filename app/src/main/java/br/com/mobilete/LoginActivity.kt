@@ -7,6 +7,12 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
+import br.com.mobilete.AppConstants.FACEBOOK
+import br.com.mobilete.AppConstants.FIREBASE
+import br.com.mobilete.AppConstants.TAG_LOGIN_EMAIL_SENHA
+import br.com.mobilete.AppConstants.TAG_LOGIN_FB
+import br.com.mobilete.AppConstants.TAG_PHOTO
+import br.com.mobilete.AppConstants.TAG_USUARIO
 import com.facebook.*
 import com.facebook.login.LoginResult
 import com.facebook.login.LoginManager
@@ -20,15 +26,6 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
-
-    companion object {
-        const val TAG_FB: String = "LoginLog - Facebook"
-        const val TAG_EMAIL_SENHA: String = "LoginLog - Email Senha"
-        const val TAG_USUARIO: String = "FirebaseLog - Recupera Usuario"
-        const val TAG_PHOTO: String = "FirebaseLog - Recupera Foto"
-        const val FIREBASE: String = "Firebase"
-        const val FACEBOOK: String = "Facebook"
-    }
 
     private var mCallbackManager: CallbackManager? = null
     private var mAuth: FirebaseAuth? = null
@@ -77,15 +74,15 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun handleFacebookAccessToken(token: AccessToken) {
-        Log.d(TAG_FB, "handleFacebookAccessToken: $token")
+        Log.d(TAG_LOGIN_FB, "handleFacebookAccessToken: $token")
         val credential = FacebookAuthProvider.getCredential(token.token)
         mAuth!!.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Log.d(TAG_FB, "Sucesso")
+                    Log.d(TAG_LOGIN_FB, "Sucesso")
                     getUsuario(mAuth!!.currentUser, FACEBOOK)
                 } else {
-                    Log.d(TAG_FB, "Falhou", task.exception)
+                    Log.d(TAG_LOGIN_FB, "Falhou", task.exception)
                     progressWheel(false)
                 }
             }
@@ -98,18 +95,18 @@ class LoginActivity : AppCompatActivity() {
         LoginManager.getInstance().registerCallback(mCallbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
-                    Log.d(TAG_FB, "Facebook token: $loginResult.accessToken.token")
+                    Log.d(TAG_LOGIN_FB, "Facebook token: $loginResult.accessToken.token")
                     handleFacebookAccessToken(loginResult.accessToken)
                 }
 
                 override fun onCancel() {
-                    Log.d(TAG_FB, "Facebook onCancel.")
+                    Log.d(TAG_LOGIN_FB, "Facebook onCancel.")
                     progressWheel(false)
                     mensagemErro("Autenticação pelo Facebook falhou!!")
                 }
 
                 override fun onError(error: FacebookException) {
-                    Log.d(TAG_FB, "Facebook onError. $error")
+                    Log.d(TAG_LOGIN_FB, "Facebook onError. $error")
                     progressWheel(false)
                     mensagemErro("Autenticação pelo Facebook falhou!!")
                 }
@@ -121,10 +118,10 @@ class LoginActivity : AppCompatActivity() {
             mAuth!!.signInWithEmailAndPassword(edtEmail.text.toString(), edtSenha.text.toString())
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG_EMAIL_SENHA, "Sucesso")
+                        Log.d(TAG_LOGIN_EMAIL_SENHA, "Sucesso")
                         getUsuario(mAuth!!.currentUser, FIREBASE)
                     } else {
-                        Log.d(TAG_EMAIL_SENHA, "Falhou ${task.exception}")
+                        Log.d(TAG_LOGIN_EMAIL_SENHA, "Falhou ${task.exception}")
                         mensagemErro("Email ou Senha invalidos!!")
                         progressWheel(false)
                     }
@@ -196,7 +193,6 @@ class LoginActivity : AppCompatActivity() {
             usuario = Usuario(fireUser!!.displayName!!, fireUser.email!!, "", fotoUrl)
             preferencias.setUsuario(usuario)
             preferencias.setProvider(FACEBOOK)
-            Log.d(TAG_FB, "getUsuario")
             goToMainActivity()
         }
     }
@@ -207,7 +203,7 @@ class LoginActivity : AppCompatActivity() {
         ref.downloadUrl.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 preferencias.setFoto(task.result.toString())
-                Log.d(TAG_PHOTO, "Deu Bom ${task.result.toString()}")
+                Log.d(TAG_PHOTO, "Sucesso ${task.result.toString()}")
                 goToMainActivity()
             } else {
                 Log.d(TAG_PHOTO, "Falhou ${task.exception}")

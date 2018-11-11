@@ -13,6 +13,10 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import br.com.mobilete.AppConstants.REQUEST_LOCATION
+import br.com.mobilete.AppConstants.REQUEST_PLACE_PICKER
+import br.com.mobilete.AppConstants.TAG_LOC
+import br.com.mobilete.AppConstants.TAG_MAP
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.ui.PlacePicker
@@ -21,15 +25,12 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import org.jetbrains.anko.locationManager
 import java.io.IOException
 
 class MapaActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
-        private const val TAG_LOC = "LocationLog - "
-        private const val TAG_MAP = "GoogleMap - "
-        private const val REQUEST_LOCATION: Int = 20
-        private const val REQUEST_PLACE_PICKER: Int = 3
         const val EXTRA_LOCALIZACAO: String = "Localizacao"
         const val EXTRA_ENDERECO: String = "Endereco"
         const val EXTRA_LUGAR: String = "Lugar"
@@ -55,7 +56,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
             mMap = googleMap
-            if (setupPermissions())
+            if (locationPermission())
                 mMap.isMyLocationEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = true
 
@@ -131,14 +132,6 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback {
         return enderecoFinal
     }
 
-    private fun setupPermissions() : Boolean {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION)
-                return false
-            }
-        return true
-    }
-
     private fun carregaLugar() {
         val builder = PlacePicker.IntentBuilder()
 
@@ -172,6 +165,14 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback {
         goToCadAnuncio.putExtras(extras)
         setResult(Activity.RESULT_OK, goToCadAnuncio)
         finish()
+    }
+
+    private fun locationPermission() : Boolean {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), AppConstants.REQUEST_LOCATION)
+            return false
+        }
+        return true
     }
 
 }

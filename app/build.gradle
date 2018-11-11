@@ -37,24 +37,24 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     //Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.4'
+    implementation 'com.google.firebase:firebase-core:16.0.5'
     implementation 'com.google.firebase:firebase-auth:16.0.5'
-    implementation 'com.google.firebase:firebase-database:16.0.4'
-    implementation 'com.google.firebase:firebase-storage:16.0.4'
+    implementation 'com.google.firebase:firebase-database:16.0.5'
+    implementation 'com.google.firebase:firebase-storage:16.0.5'
 
     //Facebook SDK
     implementation 'com.facebook.android:facebook-android-sdk:4.17.0'
 
-    // Material Design Android Library
+    //Material Design Android Library
     implementation 'com.github.navasmdc:MaterialDesign:1.5@aar'
 
-    // Android Process Button
+    //Android Process Button
     implementation 'com.github.dmytrodanylyk.android-process-button:library:1.0.0'
 
     //Glide e Transformations
     implementation 'jp.wasabeef:glide-transformations:3.3.0'
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
-    kapt 'com.github.bumptech.glide:compiler:4.7.1'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    kapt 'com.github.bumptech.glide:compiler:4.8.0'
 
     //Anko
     implementation "org.jetbrains.anko:anko:0.10.7"
@@ -65,6 +65,9 @@ dependencies {
 
     //FloatingActionButton
     implementation 'com.getbase:floatingactionbutton:1.10.1'
+
+    //CircleImageView
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
 
 
 }
