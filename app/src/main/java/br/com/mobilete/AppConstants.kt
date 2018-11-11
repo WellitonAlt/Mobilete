@@ -7,7 +7,8 @@ object AppConstants{
     const val REQUEST_PLACE_PICKER: Int = 40
     const val REQUEST_EXTERNAL: Int = 50
 
-    const val DELETE: Int = 1
+    const val DELETA: Int = 1
+    const val EDITA: Int = 2
 
     const val TAG_CAD: String = "FirebaseLog - Salva no Banco"
     const val TAG_UP: String = "FirebaseLog - Upload Foto"

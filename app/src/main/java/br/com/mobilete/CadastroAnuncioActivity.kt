@@ -6,6 +6,8 @@ import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -18,12 +20,13 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import br.com.mobilete.AppConstants.ANUNCIO
 import br.com.mobilete.AppConstants.REQUEST_CAMERA
-import br.com.mobilete.AppConstants.REQUEST_EXTERNAL
 import br.com.mobilete.AppConstants.REQUEST_GALERIA
 import br.com.mobilete.AppConstants.REQUEST_LOCATION
 import br.com.mobilete.AppConstants.TAG_CAD
 import br.com.mobilete.AppConstants.TAG_UP
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
@@ -32,6 +35,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_cadastro_anuncio.*
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,11 +44,15 @@ class CadastroAnuncioActivity : AppCompatActivity() {
     private var fotoCamera: Uri? = null
     private var fotoAceita: Uri? = null
     private var anuncio : Anuncio? = null
+    private var edicao: Boolean = false
+    private var mudouFoto: Boolean = false
     private lateinit var calendario: Calendar
     private lateinit var dialog: ProgressDialog
 
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
+    private lateinit var database: FirebaseDatabase
+    private lateinit var databaseRef: DatabaseReference
     private var loc : String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +63,8 @@ class CadastroAnuncioActivity : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
         user = mAuth!!.currentUser
+        database = FirebaseDatabase.getInstance()
+        databaseRef = database.getReference("anuncios").child(user!!.uid)
 
         calendario = Calendar.getInstance()
 
@@ -64,6 +74,10 @@ class CadastroAnuncioActivity : AppCompatActivity() {
         val ano = calendario.get(Calendar.YEAR)
         val mes = calendario.get(Calendar.MONTH)
         val dia = calendario.get(Calendar.DAY_OF_MONTH)
+
+        anuncio = intent.getSerializableExtra(ANUNCIO) as Anuncio?
+        if (anuncio != null)
+            carregaDados()
 
         carregaFoto()
 
@@ -87,12 +101,17 @@ class CadastroAnuncioActivity : AppCompatActivity() {
         }
 
         btnCadastrar.setOnClickListener {
-            cadastraAnuncio()
+            if(edicao)
+                editaAnuncio()
+            else
+                cadastraAnuncio()
         }
 
         btnMapa.setOnClickListener {
-            val goToMapa = Intent(this, MapaActivity::class.java)
-            startActivityForResult(goToMapa, REQUEST_LOCATION)
+            if (locationPermission()) {
+                val goToMapa = Intent(this, MapaActivity::class.java)
+                startActivityForResult(goToMapa, REQUEST_LOCATION)
+            }
         }
     }
 
@@ -109,6 +128,7 @@ class CadastroAnuncioActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if(requestCode == REQUEST_CAMERA && resultCode == Activity.RESULT_OK){
+            mudouFoto = true
             fotoAceita = fotoCamera
             carregaFoto()
         }
@@ -128,6 +148,7 @@ class CadastroAnuncioActivity : AppCompatActivity() {
 
         if (requestCode == REQUEST_GALERIA && resultCode == Activity.RESULT_OK) {
             if (data != null){
+                mudouFoto = true
                 fotoAceita = data.data
                 carregaFoto()
             }
@@ -182,23 +203,38 @@ class CadastroAnuncioActivity : AppCompatActivity() {
             progressWheel(false)
     }
 
+    private fun editaAnuncio(){
+        progressWheel(true)
+        if (validaCampos()) {
+            anuncio!!.descricao = edtDescricao.text.toString()
+            anuncio!!.validade = txtValidade.text.toString()
+            anuncio!!.valor = edtValor.text.toString()
+            if(loc != null && loc != anuncio!!.localizacao)
+                anuncio!!.localizacao = loc!!
+            if(mudouFoto) {
+                uploadFoto(anuncio!!.id)
+                return
+            }
+            salvaAnuncio(anuncio!!.id)
+        }else
+            progressWheel(false)
+    }
+
     private fun getKey(){
-        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val ref: DatabaseReference = database.getReference("anuncios").child(user!!.uid)
-        val key = ref.push().key
+        val key = databaseRef.push().key
         anuncio!!.id = key!!
-        uploadFoto(key, ref)
+        uploadFoto(key)
 
     }
 
-    private fun uploadFoto(key: String, dataBaseRef: DatabaseReference) {
+    private fun uploadFoto(key: String) {
         val storage: FirebaseStorage = FirebaseStorage.getInstance()
         val ref: StorageReference = storage.getReference("img_anuncio").child(key)
         ref.putFile(fotoAceita!!)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG_UP, "Sucesso")
-                    getStorageUrl(key, dataBaseRef, ref)
+                    getStorageUrl(key, ref)
                 } else {
                     Log.d(TAG_UP, "Falhou ${task.exception}")
                     mensagemErro("Ocorreu um erro ao fazer upload da imagem!!")
@@ -206,20 +242,20 @@ class CadastroAnuncioActivity : AppCompatActivity() {
             }
     }
 
-    private fun getStorageUrl(key: String, dataBaseRef: DatabaseReference, storageRef: StorageReference){
+    private fun getStorageUrl(key: String, storageRef: StorageReference){
        storageRef.downloadUrl.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d(TAG_UP, "Sucesso")
                 anuncio!!.foto = task.result.toString()
-                salvaAnuncio(key, dataBaseRef)
+                salvaAnuncio(key)
             } else {
                 Log.d(TAG_UP, "Falhou ${task.exception}")
             }
         }
     }
 
-    private fun salvaAnuncio(key: String, ref: DatabaseReference){
-        ref.child(key).setValue(anuncio)
+    private fun salvaAnuncio(key: String){
+        databaseRef.child(key).setValue(anuncio)
             .addOnCompleteListener(this){ task ->
                 if (task.isSuccessful){
                     Log.d(TAG_CAD, "Sucesso $key")
@@ -283,6 +319,9 @@ class CadastroAnuncioActivity : AppCompatActivity() {
     }
 
     private fun limpaCampos(){
+        if (edicao)
+            finish()
+
         edtDescricao.setText("")
         txtValidade.text = ""
         edtValor.setText("")
@@ -302,6 +341,50 @@ class CadastroAnuncioActivity : AppCompatActivity() {
             .into(findViewById<View>(R.id.imgAnuncio) as ImageView)
     }
 
+    private fun carregaDados(){
+        val latLongStr = anuncio!!.localizacao
+            .replace("(","")
+            .replace(")","")
+            .replace("lat/lng: ","")
+            .split(",")
+
+        val latitude = latLongStr[0].toDouble()
+        val longitude = latLongStr[1].toDouble()
+        val latLong = LatLng(latitude, longitude)
+
+        edtDescricao.setText(anuncio!!.descricao)
+        txtValidade.text = anuncio!!.validade
+        edtValor.setText(anuncio!!.valor)
+        txtMapa.text = getEndereco(latLong)
+        fotoAceita = Uri.parse(anuncio!!.foto)
+
+        btnCadastrar.text = "Atualizar"
+        edicao = true
+
+    }
+
+    private fun getEndereco(latLng: LatLng): String {
+        val geocoder = Geocoder(this)
+        val enderecos: List<Address>?
+        val endereco: Address?
+
+        var enderecoFinal = ""
+        try {
+            enderecos = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+            if (null != enderecos && !enderecos.isEmpty()) {
+                endereco = enderecos[0]
+                for (i in 0..endereco.maxAddressLineIndex) {
+                    enderecoFinal += if (i == 0) endereco.getAddressLine(i) else "\n" + endereco.getAddressLine(i)
+                }
+            }
+        } catch (e: IOException) {
+            Log.e(AppConstants.TAG_MAP, e.localizedMessage)
+        }
+        if (enderecoFinal == "")
+            enderecoFinal = "Endereço indiponivel no momento $latLng"
+        return enderecoFinal
+    }
+
     private fun readExternalPermission(): Boolean {
         if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), AppConstants.REQUEST_EXTERNAL)
@@ -313,6 +396,14 @@ class CadastroAnuncioActivity : AppCompatActivity() {
     private fun cameraPermission(): Boolean {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), AppConstants.REQUEST_CAMERA)
+            return false
+        }
+        return true
+    }
+
+    private fun locationPermission() : Boolean {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), AppConstants.REQUEST_LOCATION)
             return false
         }
         return true

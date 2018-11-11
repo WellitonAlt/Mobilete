@@ -1,6 +1,7 @@
 package br.com.mobilete
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -11,7 +12,9 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
-import br.com.mobilete.AppConstants.DELETE
+import br.com.mobilete.AppConstants.ANUNCIO
+import br.com.mobilete.AppConstants.DELETA
+import br.com.mobilete.AppConstants.EDITA
 import br.com.mobilete.AppConstants.TAG_ANUNCIO
 import br.com.mobilete.AppConstants.TAG_ANUNCIO_DELETE
 import br.com.mobilete.AppConstants.TAG_ANUNCIO_FOTO
@@ -21,6 +24,7 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_meus_anuncios.*
+import java.io.Serializable
 
 class MeusAnunciosActivity :  AppCompatActivity(){
 
@@ -54,9 +58,10 @@ class MeusAnunciosActivity :  AppCompatActivity(){
                 //8 Direita
                 if (direction == 8){
                     Log.d("Direcao", "Direita")
+                    alerta(adapter.getItem(viewHolder.adapterPosition), viewHolder.adapterPosition, EDITA)
                 }else if (direction == 4){
                     Log.d("Direcao", "Esquerda")
-                    alerta(adapter.getItem(viewHolder.adapterPosition), viewHolder.adapterPosition, DELETE)
+                    alerta(adapter.getItem(viewHolder.adapterPosition), viewHolder.adapterPosition, DELETA)
                 }
             }
         }
@@ -142,7 +147,7 @@ class MeusAnunciosActivity :  AppCompatActivity(){
         val adapter = recyclerView.adapter as SwipeAdapter
         val mensagem: String
 
-        if (op == DELETE)
+        if (op == DELETA)
             mensagem = "Deseja Deletar esse Anuncio?"
         else
             mensagem = "Deseja Editar esse Anuncio?"
@@ -150,9 +155,14 @@ class MeusAnunciosActivity :  AppCompatActivity(){
         builder.setTitle(mensagem)
         builder.setMessage(anuncio.descricao)
         builder.setPositiveButton("Sim"){dialog, which ->
-            if(op == DELETE) {
+            if(op == DELETA) {
                 adapter.removeAt(possicao)
                 deletaAnuncio(anuncio)
+            }else{
+                val goToEdita = Intent(this, CadastroAnuncioActivity::class.java)
+                goToEdita.putExtra(ANUNCIO, anuncio)
+                startActivity(goToEdita)
+                listaAnuncios()
             }
         }
         builder.setNegativeButton("Não"){dialog, which ->

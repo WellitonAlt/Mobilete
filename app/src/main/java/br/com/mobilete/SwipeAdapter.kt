@@ -1,16 +1,13 @@
 package br.com.mobilete
 
-import android.support.v4.content.ContextCompat
+
 import android.support.v4.widget.CircularProgressDrawable
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.meus_anuncios_lista.view.*
+import me.grantland.widget.AutofitHelper
 
 class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapter<SwipeAdapter.VH>() {
 
@@ -48,8 +45,10 @@ class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapt
             circularProgressDrawable.centerRadius = 30f
             circularProgressDrawable.start()
 
+            AutofitHelper.create(txtDescricao)
             txtDescricao.text = anuncio.descricao
-            txtValidade.text = anuncio.validade
+            txtValidade.text = "Validade: ${anuncio.validade}"
+            txtValor.text = "Valor: %.2f".format(anuncio.valor.toFloat())
             GlideApp.with(this)
                 .load(anuncio.foto)
                 .placeholder(circularProgressDrawable)

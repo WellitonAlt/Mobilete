@@ -56,8 +56,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
             mMap = googleMap
-            if (locationPermission())
-                mMap.isMyLocationEnabled = true
+            mMap.isMyLocationEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = true
 
             //Click no Mapa
@@ -165,14 +164,6 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback {
         goToCadAnuncio.putExtras(extras)
         setResult(Activity.RESULT_OK, goToCadAnuncio)
         finish()
-    }
-
-    private fun locationPermission() : Boolean {
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), AppConstants.REQUEST_LOCATION)
-            return false
-        }
-        return true
     }
 
 }
