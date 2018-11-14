@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".AnuncioActivity"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:background="@mipmap/fundo_round">
+    <requestFocus />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgAnuncio"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        custom:civ_border_width="2dp"
+        custom:civ_border_color="@android:color/white"/>
+
+
+    <LinearLayout
+            android:id="@+id/linearForm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+        <TextView
+                android:id="@+id/txtDescricao"
+                style="@style/FormEditText"
+                android:background="@drawable/rounded"
+                android:gravity="center"
+                android:textAlignment="textStart"
+                android:hint="@string/descricao"
+                android:autofillHints="@string/descricao"
+                android:drawableStart="@drawable/ic_edit_grey_24dp"
+                tools:ignore="RtlCompat,UnusedAttribute"/>
+
+        <LinearLayout
+                android:id="@+id/linearFormDois"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            <TextView
+                    android:id="@+id/txtValidade"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    style="@style/FormEditText"
+                    android:background="@drawable/rounded"
+                    android:gravity="center"
+                    android:textAlignment="textStart"
+                    android:hint="@string/validade"
+                    android:autofillHints="@string/validade"
+                    android:drawableStart="@drawable/ic_date_range_grey_24dp"
+                    tools:ignore="RtlCompat,UnusedAttribute"/>
+
+            <TextView
+                    android:id="@+id/txtValor"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    style="@style/FormEditText"
+                    android:background="@drawable/rounded"
+                    android:gravity="center"
+                    android:textAlignment="textStart"
+                    android:hint="@string/valor"
+                    android:autofillHints="@string/valor"
+                    android:drawableStart="@drawable/ic_thumb_up_grey_24dp"
+                    tools:ignore="RtlCompat,UnusedAttribute"/>
+
+        </LinearLayout>
+
+        <TextView
+                android:id="@+id/txtMapa"
+                style="@style/FormEditText"
+                android:layout_height="80dp"
+                android:background="@drawable/rounded"
+                android:gravity="center"
+                android:textAlignment="textStart"
+                android:hint="@string/mapa"
+                android:autofillHints="@string/mapa"
+                android:drawableStart="@drawable/ic_map_grey_24dp"
+                tools:ignore="RtlCompat,UnusedAttribute"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -1,158 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-        android:layout_height="match_parent"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent">
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:custom="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".CadastroAnuncioActivity"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:background="@mipmap/fundo_round">
+<requestFocus />
+
+<FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".CadastroAnuncioActivity"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:contentDescription="@string/descriptionImgProduto"
-        android:background="@mipmap/fundo_round">
-    <requestFocus />
+        android:layout_height="230dp">
 
-    <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="230dp">
+    <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgAnuncio"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            custom:civ_border_width="2dp"
+            custom:civ_border_color="@android:color/white"/>
 
-        <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imgAnuncio"
-                android:layout_width="180dp"
-                android:layout_height="180dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                custom:civ_border_width="2dp"
-                custom:civ_border_color="@android:color/white"/>
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+            android:id="@+id/btnMais"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="15dp"
+            custom:fab_addButtonColorNormal="@color/colorPrimaryDark"
+            custom:fab_addButtonColorPressed="@color/colorPrimary"
+            custom:fab_icon="@drawable/ic_add_a_photo_white_24dp"
+            custom:fab_labelsPosition="right">
 
-        <com.getbase.floatingactionbutton.FloatingActionsMenu
-                android:id="@+id/btnMais"
+        <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnFoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_marginEnd="15dp"
-                custom:fab_addButtonColorNormal="@color/colorPrimaryDark"
-                custom:fab_addButtonColorPressed="@color/colorPrimary"
+                custom:fab_colorNormal="@color/colorPrimaryDark"
+                custom:fab_colorPressed="@color/colorPrimary"
                 custom:fab_icon="@drawable/ic_add_a_photo_white_24dp"
-                custom:fab_labelsPosition="right">
+                custom:fab_size="mini"/>
 
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btnFoto"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    custom:fab_colorNormal="@color/colorPrimaryDark"
-                    custom:fab_colorPressed="@color/colorPrimary"
-                    custom:fab_icon="@drawable/ic_add_a_photo_white_24dp"
-                    custom:fab_size="mini"/>
+        <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnGaleria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                custom:fab_colorNormal="@color/colorPrimaryDark"
+                custom:fab_colorPressed="@color/colorPrimary"
+                custom:fab_icon="@drawable/ic_collections_black_24dp"
+                custom:fab_size="mini"/>
 
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btnGaleria"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    custom:fab_colorNormal="@color/colorPrimaryDark"
-                    custom:fab_colorPressed="@color/colorPrimary"
-                    custom:fab_icon="@drawable/ic_collections_black_24dp"
-                    custom:fab_size="mini"/>
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
-        </com.getbase.floatingactionbutton.FloatingActionsMenu>
+</FrameLayout>
 
-    </FrameLayout>
+<LinearLayout
+        android:id="@+id/linearForm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+    <EditText
+            android:id="@+id/edtDescricao"
+            style="@style/FormEditText"
+            android:inputType="textCapSentences"
+            android:hint="@string/descricao"
+            android:autofillHints="@string/descricao"
+            android:drawableStart="@drawable/ic_edit_grey_24dp"/>
 
     <LinearLayout
-            android:id="@+id/linearForm"
+            android:id="@+id/linearFormDois"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical">
+            android:orientation="horizontal">
+
+        <TextView
+                android:id="@+id/txtValidade"
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
+                style="@style/FormEditText"
+                android:background="@drawable/rounded"
+                android:gravity="center"
+                android:textAlignment="textStart"
+                android:hint="@string/validade"
+                android:autofillHints="@string/validade"
+                android:drawableStart="@drawable/ic_date_range_grey_24dp" tools:ignore="RtlCompat,UnusedAttribute"/>
 
         <EditText
-                android:id="@+id/edtDescricao"
+                android:id="@+id/edtValor"
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
                 style="@style/FormEditText"
-                android:inputType="textCapSentences"
-                android:hint="@string/descricao"
-                android:autofillHints="@string/descricao"
-                android:drawableStart="@drawable/ic_edit_grey_24dp"/>
+                android:inputType="numberDecimal"
+                android:hint="@string/valor"
+                android:imeOptions="actionDone"
+                android:autofillHints="Valor"
+                android:drawableStart="@drawable/ic_thumb_up_grey_24dp"/>
 
-        <LinearLayout
-                android:id="@+id/linearFormDois"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+    </LinearLayout>
 
-            <TextView
-                    android:id="@+id/txtValidade"
-                    android:layout_weight="0.5"
-                    android:layout_width="0dp"
-                    style="@style/FormEditText"
-                    android:background="@drawable/rounded"
-                    android:gravity="center"
-                    android:textAlignment="textStart"
-                    android:hint="@string/validade"
-                    android:autofillHints="@string/validade"
-                    android:drawableStart="@drawable/ic_date_range_grey_24dp" tools:ignore="RtlCompat,UnusedAttribute"/>
-
-            <EditText
-                    android:id="@+id/edtValor"
-                    android:layout_weight="0.5"
-                    android:layout_width="0dp"
-                    style="@style/FormEditText"
-                    android:inputType="numberDecimal"
-                    android:hint="@string/valor"
-                    android:imeOptions="actionDone"
-                    android:autofillHints="Valor"
-                    android:drawableStart="@drawable/ic_thumb_up_grey_24dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-                android:id="@+id/linearFormTres"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-            <com.dd.processbutton.FlatButton
-                    android:id="@+id/btnMapa"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_margin="10dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
-                    android:drawableStart="@drawable/ic_map_white_24dp"
-                    custom:pb_colorNormal="@color/colorPrimary"
-                    custom:pb_colorPressed="@color/colorPrimaryDark"/>
-
-            <TextView
-                    android:id="@+id/txtMapa"
-                    android:layout_height="80dp"
-                    style="@style/FormEditText"
-                    android:gravity="center"
-                    android:hint="@string/local"
-                    android:autofillHints="@string/local"/>
-        </LinearLayout>
-
+    <LinearLayout
+            android:id="@+id/linearFormTres"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
         <com.dd.processbutton.FlatButton
-                android:id="@+id/btnCadastrar"
+                android:id="@+id/btnMapa"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:text="@string/cadastrar"
-                android:textColor="@android:color/white"
+                android:layout_marginStart="8dp"
+                android:layout_margin="10dp"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:drawableStart="@drawable/ic_map_white_24dp"
                 custom:pb_colorNormal="@color/colorPrimary"
                 custom:pb_colorPressed="@color/colorPrimaryDark"/>
 
+        <TextView
+                android:id="@+id/txtMapa"
+                android:layout_height="80dp"
+                style="@style/FormEditText"
+                android:gravity="center"
+                android:hint="@string/local"
+                android:autofillHints="@string/local"/>
     </LinearLayout>
 
 
+    <com.dd.processbutton.FlatButton
+            android:id="@+id/btnCadastrar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:text="@string/cadastrar"
+            android:textColor="@android:color/white"
+            custom:pb_colorNormal="@color/colorPrimary"
+            custom:pb_colorPressed="@color/colorPrimaryDark"/>
+
     </LinearLayout>
-</ScrollView>
+
+
+</LinearLayout>
