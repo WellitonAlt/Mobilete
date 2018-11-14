@@ -11,18 +11,26 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_anuncio.*
 import java.io.IOException
 
-class AnuncioActivity : AppCompatActivity() {
+class AnuncioActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var fotoAceita: Uri? = null
     private var anuncio : Anuncio? = null
+    private lateinit var latLong : LatLng
+    private lateinit var mapFragment : SupportMapFragment
+    private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_cadastro_anuncio)
+        setContentView(R.layout.activity_anuncio)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -34,12 +42,8 @@ class AnuncioActivity : AppCompatActivity() {
 
         carregaFoto()
 
-        /*btnMapa.setOnClickListener {
-            if (locationPermission()) {
-                val goToMapa = Intent(this, MapaActivity::class.java)
-                startActivityForResult(goToMapa, AppConstants.REQUEST_LOCATION)
-            }
-        }*/
+        mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragmentAnuncio) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -49,6 +53,17 @@ class AnuncioActivity : AppCompatActivity() {
         } else {
             super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        colocaMarkerNoMap(latLong)
+
+    }
+
+    private fun colocaMarkerNoMap(location: LatLng) {
+        val markerOptions = MarkerOptions().position(location)
+        mMap.addMarker(markerOptions)
     }
 
     private fun mensagemErro(mensagem: String, editText: EditText){
@@ -77,12 +92,11 @@ class AnuncioActivity : AppCompatActivity() {
 
         val latitude = latLongStr[0].toDouble()
         val longitude = latLongStr[1].toDouble()
-        val latLong = LatLng(latitude, longitude)
+        latLong = LatLng(latitude, longitude)
 
         txtDescricao.text = (anuncio!!.descricao)
         txtValidade.text = anuncio!!.validade
         txtValor.text = ("%.2f".format(anuncio!!.valor.toFloat()))
-        txtMapa.text = getEndereco(latLong)
         fotoAceita = Uri.parse(anuncio!!.foto)
 
     }
