@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.request.RequestOptions
-import kotlinx.android.synthetic.main.meus_anuncios_lista.view.*
+import kotlinx.android.synthetic.main.anuncios_lista.view.*
 import me.grantland.widget.AutofitHelper
 
 class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapter<SwipeAdapter.VH>() {
@@ -37,7 +37,7 @@ class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapt
     }
 
     class VH(parent: ViewGroup) : RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(R.layout.meus_anuncios_lista, parent, false)) {
+        LayoutInflater.from(parent.context).inflate(R.layout.anuncios_lista, parent, false)) {
 
         fun bind(anuncio: Anuncio ) = with(itemView) {
             val circularProgressDrawable = CircularProgressDrawable(itemView.context)
