@@ -13,6 +13,7 @@
         tools:context=".CadastroAnuncioActivity"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:contentDescription="@string/descriptionImgProduto"
         android:background="@mipmap/fundo_round">
     <requestFocus />
 
