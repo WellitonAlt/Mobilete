@@ -37,5 +37,7 @@
     <string name="procurar">Procurar</string>
     <string name="tituloApp">Mobilete</string>
     <string name="meus_anuncios">Meus Anuncios</string>
+    <string name="texto_sobre">Este aplicativo foi feito com o intuito de me formar já que eu preciso de 4 créditos de tópicos profissionalizantes.</string>
+    <string name="descriptionImgProduto">Imagem Produto</string>
 
 </resources>

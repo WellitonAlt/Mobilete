@@ -84,6 +84,13 @@
                 android:label="Mobilete - Meus Anuncios">
         </activity>
         <activity android:name=".AnuncioActivity">
+        <activity
+                android:name=".MeusAnunciosActivity"
+                android:label="Mobilete - Meus Anuncios">
+        </activity>
+        <activity
+                android:name=".SobreActivity"
+                android:label="Sobre">
         </activity>
     </application>
 

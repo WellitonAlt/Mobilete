@@ -15,6 +15,7 @@ import br.com.mobilete.AppConstants.ANUNCIO
 import br.com.mobilete.AppConstants.FACEBOOK
 import br.com.mobilete.AppConstants.LOGIN
 import br.com.mobilete.AppConstants.MEUS_ANUNCIO
+import br.com.mobilete.AppConstants.SOBRE
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.facebook.login.LoginManager
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 it.itemId == R.id.opSobre -> {
-                    Toast.makeText(this, "Sobre", Toast.LENGTH_SHORT).show()
+                    goToActivity(SOBRE)
                     true
                 }
                 it.itemId == R.id.opSair -> {
@@ -97,6 +98,7 @@ class MainActivity : AppCompatActivity() {
             }
             ANUNCIO -> startActivity(Intent(this, CadastroAnuncioActivity::class.java))
             MEUS_ANUNCIO -> startActivity(Intent(this, MeusAnunciosActivity::class.java))
+            SOBRE -> startActivity(Intent(this, SobreActivity::class.java))
         }
 
     }

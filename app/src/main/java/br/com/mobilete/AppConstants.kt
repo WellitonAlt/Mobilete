@@ -31,6 +31,7 @@ object AppConstants{
     const val LOGIN: String = "Login"
     const val ANUNCIO: String = "Anuncio"
     const val MEUS_ANUNCIO: String = "MeusAnuncio"
+    const val SOBRE: String = "Sobre"
 
 
 }
