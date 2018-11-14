@@ -21,6 +21,13 @@
                         android:elevation="4dp"
                         app:title="@string/tituloApp"
                         app:titleTextColor="@android:color/white" />
+
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rvAnuncios"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:listitem="@layout/anuncios_lista"/>
+
         </FrameLayout>
 
         <android.support.design.widget.NavigationView
