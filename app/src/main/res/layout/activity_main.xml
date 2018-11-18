@@ -7,39 +7,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity"
-        android:id="@+id/drawerLayout">
+        android:id="@+id/drawerLayout"
+        android:background="@mipmap/fundo">
 
-        <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                      android:orientation="vertical">
+            <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbarApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@color/colorPrimary"
+                    android:elevation="4dp"
+                    app:title="@string/tituloApp"
+                    app:titleTextColor="@android:color/white"/>
 
-                <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbarApp"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
-                        android:background="@color/colorPrimary"
-                        android:elevation="4dp"
-                        app:title="@string/tituloApp"
-                        app:titleTextColor="@android:color/white" />
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvAnuncios"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:listitem="@layout/anuncios_lista"/>
+        </LinearLayout>
 
-                <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rvAnuncios"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        tools:listitem="@layout/anuncios_lista"/>
+    </FrameLayout>
 
-        </FrameLayout>
-
-        <android.support.design.widget.NavigationView
-                android:id="@+id/navigationView"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="@android:color/white"
-                app:itemTextColor="@android:color/black"
-                app:itemIconTint="@android:color/black"
-                app:menu="@menu/menu_navigation_drawer"
-                android:layout_gravity="start"
-                app:headerLayout="@layout/nav_header">
-        </android.support.design.widget.NavigationView>
+    <android.support.design.widget.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            app:itemTextColor="@android:color/black"
+            app:itemIconTint="@android:color/black"
+            app:menu="@menu/menu_navigation_drawer"
+            android:layout_gravity="start"
+            app:headerLayout="@layout/nav_header">
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

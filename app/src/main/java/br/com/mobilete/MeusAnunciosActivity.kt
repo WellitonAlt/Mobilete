@@ -59,6 +59,7 @@ class MeusAnunciosActivity :  AppCompatActivity(){
                 if (direction == 8){
                     Log.d("Direcao", "Direita")
                     alerta(adapter.getItem(viewHolder.adapterPosition), viewHolder.adapterPosition, EDITA)
+                //4 Esquerda
                 }else if (direction == 4){
                     Log.d("Direcao", "Esquerda")
                     alerta(adapter.getItem(viewHolder.adapterPosition), viewHolder.adapterPosition, DELETA)

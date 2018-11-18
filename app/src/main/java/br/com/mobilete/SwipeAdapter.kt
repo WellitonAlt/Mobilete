@@ -48,7 +48,11 @@ class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapt
             AutofitHelper.create(txtDescricao)
             txtDescricao.text = anuncio.descricao
             txtValidade.text = "Validade: ${anuncio.validade}"
-            txtValor.text = "Valor: %.2f".format(anuncio.valor.toFloat())
+            if(anuncio.valor.isNullOrEmpty()){
+                txtValor.text = "Valor: 0,00"
+            } else {
+                txtValor.text = "Valor: %.2f".format(anuncio.valor.toFloat())
+            }
             GlideApp.with(this)
                 .load(anuncio.foto)
                 .placeholder(circularProgressDrawable)
