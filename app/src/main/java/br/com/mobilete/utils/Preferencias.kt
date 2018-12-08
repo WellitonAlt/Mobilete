@@ -1,6 +1,7 @@
-package br.com.mobilete
+package br.com.mobilete.utils
 
 import android.content.Context
+import br.com.mobilete.entities.Usuario
 
 class Preferencias(context: Context) {
 

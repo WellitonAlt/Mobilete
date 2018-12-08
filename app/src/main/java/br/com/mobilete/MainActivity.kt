@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.MenuItem
@@ -15,21 +14,22 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import br.com.mobilete.AppConstants.ANUNCIO
-import br.com.mobilete.AppConstants.FACEBOOK
-import br.com.mobilete.AppConstants.LOGIN
-import br.com.mobilete.AppConstants.MEUS_ANUNCIO
-import br.com.mobilete.AppConstants.SOBRE
+import br.com.mobilete.entities.AppConstants.ANUNCIO
+import br.com.mobilete.entities.AppConstants.FACEBOOK
+import br.com.mobilete.entities.AppConstants.LOGIN
+import br.com.mobilete.entities.AppConstants.MEUS_ANUNCIO
+import br.com.mobilete.entities.AppConstants.SOBRE
 import br.com.mobilete.R.style.ProgressDialogStyle
+import br.com.mobilete.entities.Anuncio
+import br.com.mobilete.entities.AppConstants
+import br.com.mobilete.utils.Preferencias
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.facebook.login.LoginManager
-import com.gc.materialdesign.R.layout.dialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_meus_anuncios.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
 
-    private lateinit var swipeAdapter: SwipeAdapter
+    private lateinit var anuncioAdapter: AnuncioAdapter
     private lateinit var dialog: ProgressDialog
 
     private val toggle: ActionBarDrawerToggle by lazy {
@@ -194,10 +194,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun listaAnuncios(){
-        swipeAdapter = SwipeAdapter(listaAnuncios)
-        rvAnuncios.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        anuncioAdapter = AnuncioAdapter(this, listaAnuncios)
+        anuncioAdapter.setOnItemClickListener {position ->
+            val anuncio = Intent(this, AnuncioActivity::class.java)
+            anuncio.putExtra(ANUNCIO, listaAnuncios[position])
+            startActivity(anuncio)
+        }
+
+        rvAnuncios.adapter = anuncioAdapter
         rvAnuncios.layoutManager = LinearLayoutManager(this)
-        rvAnuncios.adapter = swipeAdapter
         progressWheel(false)
     }
 

@@ -20,12 +20,15 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
-import br.com.mobilete.AppConstants.ANUNCIO
-import br.com.mobilete.AppConstants.REQUEST_CAMERA
-import br.com.mobilete.AppConstants.REQUEST_GALERIA
-import br.com.mobilete.AppConstants.REQUEST_LOCATION
-import br.com.mobilete.AppConstants.TAG_CAD
-import br.com.mobilete.AppConstants.TAG_UP
+import br.com.mobilete.entities.AppConstants.ANUNCIO
+import br.com.mobilete.entities.AppConstants.REQUEST_CAMERA
+import br.com.mobilete.entities.AppConstants.REQUEST_GALERIA
+import br.com.mobilete.entities.AppConstants.REQUEST_LOCATION
+import br.com.mobilete.entities.AppConstants.TAG_CAD
+import br.com.mobilete.entities.AppConstants.TAG_UP
+import br.com.mobilete.entities.Anuncio
+import br.com.mobilete.entities.AppConstants
+import br.com.mobilete.utils.GlideApp
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -197,7 +200,8 @@ class CadastroAnuncioActivity : AppCompatActivity() {
                 edtDescricao.text.toString(),
                 txtValidade.text.toString(),
                 edtValor.text.toString(),
-                loc!!)
+                loc!!
+            )
             getKey()
         }else
             progressWheel(false)

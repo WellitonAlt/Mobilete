@@ -12,19 +12,19 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
-import br.com.mobilete.AppConstants.ANUNCIO
-import br.com.mobilete.AppConstants.DELETA
-import br.com.mobilete.AppConstants.EDITA
-import br.com.mobilete.AppConstants.TAG_ANUNCIO
-import br.com.mobilete.AppConstants.TAG_ANUNCIO_DELETE
-import br.com.mobilete.AppConstants.TAG_ANUNCIO_FOTO
+import br.com.mobilete.entities.AppConstants.ANUNCIO
+import br.com.mobilete.entities.AppConstants.DELETA
+import br.com.mobilete.entities.AppConstants.EDITA
+import br.com.mobilete.entities.AppConstants.TAG_ANUNCIO
+import br.com.mobilete.entities.AppConstants.TAG_ANUNCIO_DELETE
+import br.com.mobilete.entities.AppConstants.TAG_ANUNCIO_FOTO
+import br.com.mobilete.entities.Anuncio
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_meus_anuncios.*
-import java.io.Serializable
 
 class MeusAnunciosActivity :  AppCompatActivity(){
 

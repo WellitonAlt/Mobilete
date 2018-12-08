@@ -1,6 +1,5 @@
 package br.com.mobilete
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -13,10 +12,10 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import br.com.mobilete.AppConstants.REQUEST_LOCATION
-import br.com.mobilete.AppConstants.REQUEST_PLACE_PICKER
-import br.com.mobilete.AppConstants.TAG_LOC
-import br.com.mobilete.AppConstants.TAG_MAP
+import br.com.mobilete.entities.AppConstants.REQUEST_LOCATION
+import br.com.mobilete.entities.AppConstants.REQUEST_PLACE_PICKER
+import br.com.mobilete.entities.AppConstants.TAG_LOC
+import br.com.mobilete.entities.AppConstants.TAG_MAP
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.ui.PlacePicker
@@ -25,8 +24,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import org.jetbrains.anko.locationManager
 import java.io.IOException
+import com.google.android.gms.maps.CameraUpdateFactory
+
+
 
 class MapaActivity : AppCompatActivity(), OnMapReadyCallback {
 

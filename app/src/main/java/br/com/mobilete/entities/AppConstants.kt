@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.entities
 
 object AppConstants{
     const val REQUEST_CAMERA: Int = 10

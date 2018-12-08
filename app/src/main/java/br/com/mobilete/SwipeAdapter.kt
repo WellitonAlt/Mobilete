@@ -5,6 +5,8 @@ import android.support.v4.widget.CircularProgressDrawable
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import br.com.mobilete.entities.Anuncio
+import br.com.mobilete.utils.GlideApp
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.anuncios_lista.view.*
 import me.grantland.widget.AutofitHelper
@@ -21,7 +23,7 @@ class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapt
 
     override fun getItemCount(): Int = items.size
 
-    fun getItem(position: Int) :Anuncio {
+    fun getItem(position: Int) : Anuncio {
         val anuncio: Anuncio = items[position]
         return anuncio
     }
@@ -39,7 +41,7 @@ class SwipeAdapter(private val items: MutableList<Anuncio>) : RecyclerView.Adapt
     class VH(parent: ViewGroup) : RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.anuncios_lista, parent, false)) {
 
-        fun bind(anuncio: Anuncio ) = with(itemView) {
+        fun bind(anuncio: Anuncio) = with(itemView) {
             val circularProgressDrawable = CircularProgressDrawable(itemView.context)
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f

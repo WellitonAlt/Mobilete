@@ -11,6 +11,10 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import br.com.mobilete.entities.Anuncio
+import br.com.mobilete.entities.AppConstants
+import br.com.mobilete.entities.AppConstants.ANUNCIO
+import br.com.mobilete.utils.GlideApp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -34,7 +38,7 @@ class AnuncioActivity : AppCompatActivity(), OnMapReadyCallback {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        anuncio = intent.getSerializableExtra(AppConstants.ANUNCIO) as Anuncio?
+        anuncio = intent.getSerializableExtra(ANUNCIO) as Anuncio?
         if (anuncio != null)
             carregaDados()
         else
@@ -57,6 +61,8 @@ class AnuncioActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        val zoomLevel = 16.0f //This goes up to 21
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLong, zoomLevel))
         colocaMarkerNoMap(latLong)
 
     }

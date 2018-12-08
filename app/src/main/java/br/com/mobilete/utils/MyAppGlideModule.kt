@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.utils
 
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule

@@ -13,19 +13,21 @@ import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import android.view.View
 import android.widget.ImageView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_cadastro_usuario.*
 import android.widget.Toast
 import android.util.Log
 import android.view.MenuItem
 import android.widget.EditText
-import br.com.mobilete.AppConstants.REQUEST_CAMERA
-import br.com.mobilete.AppConstants.REQUEST_GALERIA
-import br.com.mobilete.AppConstants.TAG_AUTH
-import br.com.mobilete.AppConstants.TAG_CAD
-import br.com.mobilete.AppConstants.TAG_UP
+import br.com.mobilete.entities.AppConstants
+import br.com.mobilete.entities.AppConstants.REQUEST_CAMERA
+import br.com.mobilete.entities.AppConstants.REQUEST_GALERIA
+import br.com.mobilete.entities.AppConstants.TAG_AUTH
+import br.com.mobilete.entities.AppConstants.TAG_CAD
+import br.com.mobilete.entities.AppConstants.TAG_UP
+import br.com.mobilete.entities.Usuario
+import br.com.mobilete.utils.GlideApp
+import br.com.mobilete.utils.Preferencias
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
@@ -100,9 +102,11 @@ class CadastroUsuarioActivity : AppCompatActivity() {
     private fun cadastraUsuaio(){
         progressWheel(true)
         if (validaCampos()) {
-            usuario = Usuario(edtNome.text.toString(),
+            usuario = Usuario(
+                edtNome.text.toString(),
                 edtEmail.text.toString(),
-                edtTelefone.text.toString())
+                edtTelefone.text.toString()
+            )
             criaAutenticadorEmailSenha(usuario, edtSenha.text.toString())
         }else
             progressWheel(false)

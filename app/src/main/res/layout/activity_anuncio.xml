@@ -81,7 +81,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="170dp"
+                android:layout_height="200dp"
                 android:name="com.google.android.gms.maps.SupportMapFragment">
         </fragment>
 

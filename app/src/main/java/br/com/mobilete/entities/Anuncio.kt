@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.entities
 
 import java.io.Serializable
 data class Anuncio (var id: String = "",
