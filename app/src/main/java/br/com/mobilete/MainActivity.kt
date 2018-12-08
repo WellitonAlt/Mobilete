@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         ActionBarDrawerToggle(this, drawerLayout, R.string.abre, R.string.fecha)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+   override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getAnuncios(){
-        val ref: DatabaseReference = database!!.getReference().child("anuncios")
+        val ref: DatabaseReference = database!!.reference.child("anuncios")
 
         ref.addValueEventListener(
             object : ValueEventListener {
@@ -165,7 +165,8 @@ class MainActivity : AppCompatActivity() {
                         }
                         Log.d(AppConstants.TAG_ANUNCIO, p.toString())
                     }
-                    listaAnuncios()
+                    limpaAnuncios()
+                    //listaAnuncios()
                 }
 
                 override fun onCancelled(dataSnapshot: DatabaseError) {
@@ -180,6 +181,16 @@ class MainActivity : AppCompatActivity() {
             dialog.show()
         else
             dialog.dismiss()
+    }
+
+    private fun limpaAnuncios(){
+        var aux: MutableList<Anuncio> = mutableListOf()
+        for(anuncio in listaAnuncios){
+            if(anuncio.usuario != user!!.uid)
+               aux.add(anuncio)
+        }
+        listaAnuncios = aux
+        listaAnuncios()
     }
 
     private fun listaAnuncios(){

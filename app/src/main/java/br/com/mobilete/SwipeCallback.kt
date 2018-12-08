@@ -88,4 +88,8 @@ abstract class SwipeCallback(context: Context) : ItemTouchHelper.SimpleCallback(
     private fun clearCanvas(c: Canvas?, left: Float, top: Float, right: Float, bottom: Float) {
         c?.drawRect(left, top, right, bottom, clearPaint)
     }
+
+    private fun onClick(){
+
+    }
 }

@@ -160,7 +160,7 @@ class MeusAnunciosActivity :  AppCompatActivity(){
                 adapter.removeAt(possicao)
                 deletaAnuncio(anuncio)
             }else{
-                val goToEdita = Intent(this, MeusAnunciosActivity::class.java)
+                val goToEdita = Intent(this, CadastroAnuncioActivity::class.java)
                 goToEdita.putExtra(ANUNCIO, anuncio)
                 startActivity(goToEdita)
                 listaAnuncios()
