@@ -1,7 +1,7 @@
 package br.com.mobilete.callbacks
 
-interface UsuarioCallback {
-    fun onCallbackUsuarioDao()
+interface AnuncioCallback {
+    fun onCallbackAnuncioDao()
     fun onCallbackUploadFoto(fotoUri: String)
     fun onError(men: String)
 }

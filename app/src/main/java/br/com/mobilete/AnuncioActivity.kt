@@ -8,13 +8,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Toast
 import br.com.mobilete.entities.Anuncio
 import br.com.mobilete.entities.AppConstants
 import br.com.mobilete.entities.AppConstants.ANUNCIO
 import br.com.mobilete.utils.GlideApp
+import br.com.mobilete.utils.Mensagens
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -42,7 +41,7 @@ class AnuncioActivity : AppCompatActivity(), OnMapReadyCallback {
         if (anuncio != null)
             carregaDados()
         else
-            mensagemErro("Aconteceu um erro ao carregar os dados!!")
+            Mensagens.mensagem(this,"Aconteceu um erro ao carregar os dados!!")
 
         carregaFoto()
 
@@ -72,16 +71,7 @@ class AnuncioActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.addMarker(markerOptions)
     }
 
-    private fun mensagemErro(mensagem: String, editText: EditText){
-        editText.error = mensagem
-        editText.requestFocus()
-    }
-
-    private fun mensagemErro(mensagem: String){
-        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun carregaFoto(){
+   private fun carregaFoto(){
         GlideApp.with(this)
             .load(fotoAceita)
             .placeholder(R.drawable.food)

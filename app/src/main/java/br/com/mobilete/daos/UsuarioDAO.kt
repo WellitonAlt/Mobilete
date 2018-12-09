@@ -73,6 +73,7 @@ class UsuarioDAO(var usuario: Usuario,
         storageRef.downloadUrl.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d(AppConstants.TAG_UP, "Pegou a url co sucesso")
+                usuario.foto = task.result.toString()
                 callback.onCallbackUploadFoto(task.result.toString())
             } else {
                 Log.d(AppConstants.TAG_UP, "Falhou ${task.exception}")

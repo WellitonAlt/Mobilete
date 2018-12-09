@@ -122,7 +122,6 @@ class CadastroUsuarioActivity : AppCompatActivity() {
     private fun uploadFoto(usuarioDao: UsuarioDAO) {
         usuarioDao.uploadFoto(object : UsuarioCallback {
             override fun onCallbackUploadFoto(fotoUri: String) {
-                usuario!!.foto = fotoUri
                 editaUsario(usuarioDao)
             }
 

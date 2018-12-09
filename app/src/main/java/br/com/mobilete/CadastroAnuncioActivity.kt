@@ -20,6 +20,8 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import br.com.mobilete.callbacks.AnuncioCallback
+import br.com.mobilete.daos.AnuncioDAO
 import br.com.mobilete.entities.AppConstants.ANUNCIO
 import br.com.mobilete.entities.AppConstants.REQUEST_CAMERA
 import br.com.mobilete.entities.AppConstants.REQUEST_GALERIA
@@ -29,6 +31,7 @@ import br.com.mobilete.entities.AppConstants.TAG_UP
 import br.com.mobilete.entities.Anuncio
 import br.com.mobilete.entities.AppConstants
 import br.com.mobilete.utils.GlideApp
+import br.com.mobilete.utils.Mensagens
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -54,8 +57,6 @@ class CadastroAnuncioActivity : AppCompatActivity() {
 
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
-    private lateinit var database: FirebaseDatabase
-    private lateinit var databaseRef: DatabaseReference
     private var loc : String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,8 +67,6 @@ class CadastroAnuncioActivity : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
         user = mAuth!!.currentUser
-        database = FirebaseDatabase.getInstance()
-        databaseRef = database.getReference("anuncios").child(user!!.uid)
 
         calendario = Calendar.getInstance()
 
@@ -168,7 +167,7 @@ class CadastroAnuncioActivity : AppCompatActivity() {
             tirarFoto.putExtra(MediaStore.EXTRA_OUTPUT, uriFoto)
             startActivityForResult(tirarFoto, REQUEST_CAMERA)
         } else {
-            mensagemErro("Impossível tirar foto")
+            Mensagens.mensagem(this, "Impossível tirar foto")
         }
     }
 
@@ -202,12 +201,40 @@ class CadastroAnuncioActivity : AppCompatActivity() {
                 edtValor.text.toString(),
                 loc!!
             )
-            getKey()
+            val anuncioDao = AnuncioDAO(anuncio!!, user!!, fotoAceita!!)
+            anuncioDao.setKey()
+            anuncioDao.uploadFoto(object: AnuncioCallback {
+                override fun onCallbackUploadFoto(fotoUri: String) {
+                    salvaAnuncio(anuncioDao)
+                }
+
+                override fun onError(men: String) {
+                    Mensagens.mensagem(this@CadastroAnuncioActivity, men)
+                    progressWheel(false)
+                }
+
+                override fun onCallbackAnuncioDao() {}
+            })
         }else
             progressWheel(false)
     }
 
+    private fun salvaAnuncio(anuncioDao: AnuncioDAO){
+        anuncioDao.salvaAnuncio(object: AnuncioCallback {
+            override fun onCallbackAnuncioDao() {
+                limpaCampos()
+                Mensagens.mensagem(this@CadastroAnuncioActivity, "Anuncio salvo com sucesso")
+            }
+            override fun onError(men: String) {
+                Mensagens.mensagem(this@CadastroAnuncioActivity, men)
+                progressWheel(false)
+            }
+            override fun onCallbackUploadFoto(fotoUri: String) {}
+        })
+    }
+
     private fun editaAnuncio(){
+        val anuncioDao = AnuncioDAO(anuncio!!, user!!, fotoAceita!!)
         progressWheel(true)
         if (validaCampos()) {
             anuncio!!.descricao = edtDescricao.text.toString()
@@ -216,62 +243,21 @@ class CadastroAnuncioActivity : AppCompatActivity() {
             if(loc != null && loc != anuncio!!.localizacao)
                 anuncio!!.localizacao = loc!!
             if(mudouFoto) {
-                uploadFoto(anuncio!!.id)
-                return
-            }
-            salvaAnuncio(anuncio!!.id)
+                anuncioDao.uploadFoto(object: AnuncioCallback {
+                    override fun onCallbackUploadFoto(fotoUri: String) {
+                        salvaAnuncio(anuncioDao)
+                    }
+                    override fun onError(men: String) {
+                        Mensagens.mensagem(this@CadastroAnuncioActivity, men)
+                    }
+                    override fun onCallbackAnuncioDao() {}
+                })
+            } else
+                salvaAnuncio(anuncioDao)
         }else
             progressWheel(false)
     }
 
-    private fun getKey(){
-        val key = databaseRef.push().key
-        anuncio!!.id = key!!
-        uploadFoto(key)
-
-    }
-
-    private fun uploadFoto(key: String) {
-        val storage: FirebaseStorage = FirebaseStorage.getInstance()
-        val ref: StorageReference = storage.getReference("img_anuncio").child(key)
-        ref.putFile(fotoAceita!!)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG_UP, "Sucesso")
-                    getStorageUrl(key, ref)
-                } else {
-                    Log.d(TAG_UP, "Falhou ${task.exception}")
-                    mensagemErro("Ocorreu um erro ao fazer upload da imagem!!")
-                }
-            }
-    }
-
-    private fun getStorageUrl(key: String, storageRef: StorageReference){
-       storageRef.downloadUrl.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG_UP, "Sucesso")
-                anuncio!!.foto = task.result.toString()
-                salvaAnuncio(key)
-            } else {
-                Log.d(TAG_UP, "Falhou ${task.exception}")
-            }
-        }
-    }
-
-    private fun salvaAnuncio(key: String){
-        databaseRef.child(key).setValue(anuncio)
-            .addOnCompleteListener(this){ task ->
-                if (task.isSuccessful){
-                    Log.d(TAG_CAD, "Sucesso $key")
-                    mensagemErro("Anuncio salvo com sucesso")
-                    limpaCampos()
-                }else{
-                    Log.d(TAG_CAD, "Falhou ${task.exception}")
-                    mensagemErro("Ocorreu um erro ao salvar no banco de dados!!")
-                    progressWheel(false)
-                }
-            }
-    }
 
     private fun validaCampos(): Boolean {
 
@@ -279,40 +265,31 @@ class CadastroAnuncioActivity : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm")
 
         if (fotoAceita == null){
-            mensagemErro("Uma foto deve ser selecionada!!")
+            Mensagens.mensagem(this, "Uma foto deve ser selecionada!!")
             return false
         }else if (edtDescricao.text.isEmpty()) {
-            mensagemErro("O campo nome deve conter informação!!", edtDescricao)
+            Mensagens.mensagemFocus(this, "O campo nome deve conter informação!!", edtDescricao)
             return false
         }else if (edtValor.text.isEmpty()) {
-            mensagemErro("O campo valor deve conter informação!!", edtValor)
+            Mensagens.mensagemFocus(this,"O campo valor deve conter informação!!", edtValor)
             return false
         } else if (edtValor.text.toString().toFloat() <= 0){
-            mensagemErro("O valor não pode ser zero ou negativo!!", edtValor)
+            Mensagens.mensagemFocus(this,"O valor não pode ser zero ou negativo!!", edtValor)
             return false
         } else if (txtValidade.text.isEmpty()) {
-            mensagemErro("O campo validade deve conter informação!!")
+            Mensagens.mensagem(this,"O campo validade deve conter informação!!")
             return false
         } else if (txtMapa.text.isEmpty()) {
-            mensagemErro("O campo local deve conter informação!!")
+            Mensagens.mensagem(this,"O campo local deve conter informação!!")
             return false
         }
 
         val data: Date = dateFormat.parse("${txtValidade.text} 23:59")
         if(data <= dataAtual){
-            mensagemErro("O validade não pode ser menor que a data atual!!")
+            Mensagens.mensagem(this,"O validade não pode ser menor que a data atual!!")
             return false
         }
         return true
-    }
-
-    private fun mensagemErro(mensagem: String, editText: EditText){
-        editText.error = mensagem
-        editText.requestFocus()
-    }
-
-    private fun mensagemErro(mensagem: String){
-        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
     }
 
     private fun progressWheel(enabled: Boolean) {
