@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.anuncio
 
 import android.app.ProgressDialog
 import android.content.Intent
@@ -11,25 +11,22 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.MenuItem
-import android.widget.Toast
+import br.com.mobilete.R
+import br.com.mobilete.callbacks.AnuncioCallback
+import br.com.mobilete.daos.AnuncioDAO
 import br.com.mobilete.entities.AppConstants.ANUNCIO
 import br.com.mobilete.entities.AppConstants.DELETA
 import br.com.mobilete.entities.AppConstants.EDITA
-import br.com.mobilete.entities.AppConstants.TAG_ANUNCIO
-import br.com.mobilete.entities.AppConstants.TAG_ANUNCIO_DELETE
-import br.com.mobilete.entities.AppConstants.TAG_ANUNCIO_FOTO
 import br.com.mobilete.entities.Anuncio
+import br.com.mobilete.utils.Mensagens
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_meus_anuncios.*
 
 class MeusAnunciosActivity :  AppCompatActivity(){
 
     private var listaAnuncios: MutableList<Anuncio> = mutableListOf()
-    private var database: FirebaseDatabase? = null
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
 
@@ -42,7 +39,6 @@ class MeusAnunciosActivity :  AppCompatActivity(){
         setContentView(R.layout.activity_meus_anuncios)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        database = FirebaseDatabase.getInstance()
         mAuth = FirebaseAuth.getInstance()
         user = mAuth!!.currentUser
 
@@ -81,47 +77,39 @@ class MeusAnunciosActivity :  AppCompatActivity(){
     }
 
     private fun getAnuncios(){
-        val ref: DatabaseReference = database!!.getReference("anuncios").child(user!!.uid)
-
-        ref.addValueEventListener( //Coleta os dados do banco
-            object : ValueEventListener  {
-                override fun onDataChange(p0: DataSnapshot) {
-                    listaAnuncios.clear()
-                    p0.children.mapNotNullTo(listaAnuncios) {
-                        it.getValue<Anuncio>(Anuncio::class.java)
-                    }
-                    Log.d(TAG_ANUNCIO, "Anuncios recuperados")
-                    listaAnuncios()
-                }
-
-                override fun onCancelled(dataSnapshot: DatabaseError) {
-                    Log.d(TAG_ANUNCIO, "Anuncios não recuperados")
-                }
+        val anuncioDao = AnuncioDAO(null, user!!, null)
+        anuncioDao.getAnuncios(object: AnuncioCallback {
+            override fun onCallbackAnuncios(anuncios: MutableList<Anuncio>) {
+                listaAnuncios = anuncios
+                listaAnuncios()
             }
-        )
+
+            override fun onCallbackAnuncioDao() {}
+
+            override fun onError(men: String) {
+                Mensagens.mensagem(this@MeusAnunciosActivity, men)
+                progressWheel(false)
+            }
+            override fun onCallbackUploadFoto(fotoUri: String) {}
+        })
     }
 
     private fun deletaAnuncio(anuncio: Anuncio){
-        val refDatabase: DatabaseReference = database!!.getReference("anuncios").child(user!!.uid).child(anuncio.id)
-        val storage: FirebaseStorage = FirebaseStorage.getInstance()
-        val refDataStore: StorageReference = storage.getReference("img_anuncio").child(anuncio.id)
-        refDatabase.setValue(null).addOnCompleteListener(this) { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG_ANUNCIO_DELETE, "Sucesso")
-            } else {
-                Log.d(TAG_ANUNCIO_DELETE, "Falhou ${task.exception}")
-                mensagemErro("Ocorreu um erro ao excluir o anuncio!!")
+        val anuncioDao = AnuncioDAO(anuncio, user!!, null)
+        anuncioDao.deletaAnuncio(object : AnuncioCallback {
+
+            override fun onError(men: String) {
+                Mensagens.mensagem(this@MeusAnunciosActivity, men)
+                progressWheel(false)
             }
-        }
-        refDataStore.delete().addOnCompleteListener(this) { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG_ANUNCIO_FOTO, "Sucesso")
-                mensagemErro("Anuncio removido com sucesso!!")
-            } else {
-                Log.d(TAG_ANUNCIO_FOTO, "Falhou ${task.exception}")
-                mensagemErro("Ocorreu um erro ao deletar a imagem!!")
-            }
-        }
+
+            override fun onCallbackAnuncioDao() {}
+
+            override fun onCallbackAnuncios(anuncios: MutableList<Anuncio>) {}
+
+            override fun onCallbackUploadFoto(fotoUri: String) {}
+
+        })
     }
 
     private fun listaAnuncios(){
@@ -130,10 +118,6 @@ class MeusAnunciosActivity :  AppCompatActivity(){
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = swipeAdapter
         progressWheel(false)
-    }
-
-    private fun mensagemErro(mensagem: String){
-        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
     }
 
     private fun progressWheel(enabled: Boolean) {

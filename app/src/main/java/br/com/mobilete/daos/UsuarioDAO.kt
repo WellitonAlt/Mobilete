@@ -10,22 +10,22 @@ import br.com.mobilete.entities.Usuario
 import br.com.mobilete.callbacks.UsuarioCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
 
-class UsuarioDAO(var usuario: Usuario,
+class UsuarioDAO(var usuario: Usuario? = null,
                  val senha: String = "",
                  var fotoUri: Uri? = null) : AppCompatActivity() {
 
-    private var fireUser: FirebaseUser? = null
+    var fireUser: FirebaseUser? = null
     private var database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private var databaseRef: DatabaseReference = database.getReference(PATH_USUARIO)
 
     fun criaAutenticadorEmailSenha(callback : UsuarioCallback) {
         val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
-        mAuth.createUserWithEmailAndPassword(usuario.email, senha)
+        mAuth.createUserWithEmailAndPassword(usuario!!.email, senha)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(AppConstants.TAG_AUTH, "Auth criada com sucesso")
@@ -39,8 +39,7 @@ class UsuarioDAO(var usuario: Usuario,
     }
 
     fun criaUsuario(callback : UsuarioCallback, fireUser: FirebaseUser) {
-        val ref: DatabaseReference = database.getReference(PATH_USUARIO).child(fireUser.uid)
-        ref.setValue(usuario)
+        databaseRef.child(fireUser.uid).setValue(usuario)
             .addOnCompleteListener(this){ task ->
                 if (task.isSuccessful){
                     Log.d(AppConstants.TAG_CAD, "Sucesso")
@@ -73,7 +72,7 @@ class UsuarioDAO(var usuario: Usuario,
         storageRef.downloadUrl.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d(AppConstants.TAG_UP, "Pegou a url co sucesso")
-                usuario.foto = task.result.toString()
+                usuario!!.foto = task.result.toString()
                 callback.onCallbackUploadFoto(task.result.toString())
             } else {
                 Log.d(AppConstants.TAG_UP, "Falhou ${task.exception}")
@@ -84,8 +83,7 @@ class UsuarioDAO(var usuario: Usuario,
 
     fun editaUsuario(callback: UsuarioCallback){
         if (fireUser != null) {
-            val ref: DatabaseReference = database.getReference(PATH_USUARIO).child(fireUser!!.uid)
-            ref.child(fireUser!!.uid).setValue(usuario)
+            databaseRef.child(fireUser!!.uid).setValue(usuario)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         Log.d(AppConstants.TAG_CAD, "Sucesso")
@@ -96,6 +94,24 @@ class UsuarioDAO(var usuario: Usuario,
                     }
                 }
         }
+    }
+
+    fun getUsuario(callback: UsuarioCallback){
+        databaseRef.child(fireUser!!.uid).addListenerForSingleValueEvent( //Coleta os dados do banco
+            object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Log.d(AppConstants.TAG_USUARIO, usuario.toString())
+                        usuario = dataSnapshot.getValue(Usuario::class.java)
+                        callback.onCallbackgetUsuario(usuario!!)
+                    }
+                }
+
+                override fun onCancelled(dataSnapshot: DatabaseError) {
+                    Log.d(AppConstants.TAG_USUARIO, "Usuario não recuperado")
+                }
+            }
+        )
     }
 
 }

@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.main
 
 import android.app.ProgressDialog
 import android.content.Intent
@@ -8,27 +8,32 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import br.com.mobilete.R
 import br.com.mobilete.entities.AppConstants.ANUNCIO
 import br.com.mobilete.entities.AppConstants.FACEBOOK
 import br.com.mobilete.entities.AppConstants.LOGIN
 import br.com.mobilete.entities.AppConstants.MEUS_ANUNCIO
 import br.com.mobilete.entities.AppConstants.SOBRE
 import br.com.mobilete.R.style.ProgressDialogStyle
+import br.com.mobilete.callbacks.AnuncioCallback
+import br.com.mobilete.daos.AnuncioDAO
+import br.com.mobilete.scenarios.sobre.SobreActivity
 import br.com.mobilete.entities.Anuncio
-import br.com.mobilete.entities.AppConstants
+import br.com.mobilete.scenarios.anuncio.AnuncioActivity
+import br.com.mobilete.scenarios.anuncio.AnuncioAdapter
+import br.com.mobilete.scenarios.anuncio.CadastroAnuncioActivity
+import br.com.mobilete.scenarios.anuncio.MeusAnunciosActivity
+import br.com.mobilete.scenarios.usuario.LoginActivity
 import br.com.mobilete.utils.Preferencias
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.facebook.login.LoginManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -39,7 +44,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var listaAnuncios: MutableList<Anuncio> = mutableListOf()
-    private var database: FirebaseDatabase? = null
     private var mAuth: FirebaseAuth? = null
     private var user: FirebaseUser? = null
 
@@ -55,7 +59,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        database = FirebaseDatabase.getInstance()
         mAuth = FirebaseAuth.getInstance()
         user = mAuth!!.currentUser
 
@@ -85,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 it.itemId == R.id.opSobre -> {
-                    Toast.makeText(this, "Sobre", Toast.LENGTH_SHORT).show()
+                    goToActivity(SOBRE)
                     true
                 }
                 it.itemId == R.id.opSair -> {
@@ -150,30 +153,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getAnuncios(){
-        val ref: DatabaseReference = database!!.reference.child("anuncios")
+        var anuncioDao = AnuncioDAO(null, user!!, null)
+        anuncioDao.getTodosAnuncios(object : AnuncioCallback {
 
-        ref.addValueEventListener(
-            object : ValueEventListener {
-                override fun onDataChange(p0: DataSnapshot) {
-                    listaAnuncios.clear()
-
-                    val newRef: MutableIterable<DataSnapshot> = p0.children
-
-                    for(p in newRef) {
-                        p.children.mapNotNullTo(listaAnuncios) {
-                            it.getValue<Anuncio>(Anuncio::class.java)
-                        }
-                        Log.d(AppConstants.TAG_ANUNCIO, p.toString())
-                    }
-                    limpaAnuncios()
-                    //listaAnuncios()
-                }
-
-                override fun onCancelled(dataSnapshot: DatabaseError) {
-                    Log.d(AppConstants.TAG_ANUNCIO, "Anuncios não recuperados")
-                }
+            override fun onCallbackAnuncios(anuncios: MutableList<Anuncio>) {
+                listaAnuncios = anuncios
+                listaAnuncios()
             }
-        )
+
+            override fun onCallbackAnuncioDao() {}
+
+            override fun onCallbackUploadFoto(fotoUri: String) {}
+
+            override fun onError(men: String) {}
+
+        })
     }
 
     private fun progressWheel(enabled: Boolean) {
@@ -183,15 +177,6 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
     }
 
-    private fun limpaAnuncios(){
-        var aux: MutableList<Anuncio> = mutableListOf()
-        for(anuncio in listaAnuncios){
-            if(anuncio.usuario != user!!.uid)
-               aux.add(anuncio)
-        }
-        listaAnuncios = aux
-        listaAnuncios()
-    }
 
     private fun listaAnuncios(){
         anuncioAdapter = AnuncioAdapter(this, listaAnuncios)

@@ -1,10 +1,11 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.anuncio
 
 
 import android.support.v4.widget.CircularProgressDrawable
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import br.com.mobilete.R
 import br.com.mobilete.entities.Anuncio
 import br.com.mobilete.utils.GlideApp
 import com.bumptech.glide.request.RequestOptions

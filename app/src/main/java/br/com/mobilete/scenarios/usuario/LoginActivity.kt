@@ -1,19 +1,20 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.usuario
 
 import android.app.ProgressDialog
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.EditText
-import android.widget.Toast
+import br.com.mobilete.scenarios.main.MainActivity
+import br.com.mobilete.R
+import br.com.mobilete.callbacks.UsuarioCallback
+import br.com.mobilete.daos.UsuarioDAO
 import br.com.mobilete.entities.AppConstants.FACEBOOK
 import br.com.mobilete.entities.AppConstants.FIREBASE
 import br.com.mobilete.entities.AppConstants.TAG_LOGIN_EMAIL_SENHA
 import br.com.mobilete.entities.AppConstants.TAG_LOGIN_FB
-import br.com.mobilete.entities.AppConstants.TAG_PHOTO
-import br.com.mobilete.entities.AppConstants.TAG_USUARIO
 import br.com.mobilete.entities.Usuario
+import br.com.mobilete.utils.Mensagens
 import br.com.mobilete.utils.Preferencias
 import com.facebook.*
 import com.facebook.login.LoginResult
@@ -22,16 +23,12 @@ import com.google.firebase.auth.FacebookAuthProvider
 import java.util.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.*
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
 
     private var mCallbackManager: CallbackManager? = null
     private var mAuth: FirebaseAuth? = null
-    private var usuario: Usuario? = null
     private lateinit var dialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,13 +101,13 @@ class LoginActivity : AppCompatActivity() {
                 override fun onCancel() {
                     Log.d(TAG_LOGIN_FB, "Facebook onCancel.")
                     progressWheel(false)
-                    mensagemErro("Autenticação pelo Facebook falhou!!")
+                    Mensagens.mensagem(this@LoginActivity, "Autenticação pelo Facebook falhou!!")
                 }
 
                 override fun onError(error: FacebookException) {
                     Log.d(TAG_LOGIN_FB, "Facebook onError. $error")
                     progressWheel(false)
-                    mensagemErro("Autenticação pelo Facebook falhou!!")
+                    Mensagens.mensagem(this@LoginActivity,"Autenticação pelo Facebook falhou!!")
                 }
             })
     }
@@ -124,7 +121,7 @@ class LoginActivity : AppCompatActivity() {
                         getUsuario(mAuth!!.currentUser, FIREBASE)
                     } else {
                         Log.d(TAG_LOGIN_EMAIL_SENHA, "Falhou ${task.exception}")
-                        mensagemErro("Email ou Senha invalidos!!")
+                        Mensagens.mensagem(this@LoginActivity,"Email ou Senha invalidos!!")
                         progressWheel(false)
                     }
                 }
@@ -135,13 +132,13 @@ class LoginActivity : AppCompatActivity() {
 
     private fun validaCampos(): Boolean {
         if (!emailValido(edtEmail.text.toString())) {
-            mensagemErro("O campo email está fora do padrão!!", edtEmail)
+            Mensagens.mensagemFocus(this, "O campo email está fora do padrão!!", edtEmail)
             return false
         } else if (edtEmail.text.isEmpty()) {
-            mensagemErro("O campo email deve conter informação!!", edtEmail)
+            Mensagens.mensagemFocus(this, "O campo email deve conter informação!!", edtEmail)
             return false
         } else if (edtSenha.text.isEmpty()) {
-            mensagemErro("O campo senha não pode ser vazio!!", edtSenha)
+            Mensagens.mensagemFocus(this, "O campo senha não pode ser vazio!!", edtSenha)
             return false
         }
         return true
@@ -151,37 +148,25 @@ class LoginActivity : AppCompatActivity() {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    private fun mensagemErro(mensagem: String, edtText: EditText) {
-        edtText.error = mensagem
-        edtText.requestFocus()
-    }
-
-    private fun mensagemErro(mensagem: String) {
-        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
-    }
-
     private fun getUsuario(fireUser: FirebaseUser?, provider: String) {
         val preferencias = Preferencias(this)
+        val usuarioDao = UsuarioDAO(null, "", null)
+        usuarioDao.fireUser = fireUser
         if (provider == FIREBASE) {
-            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-            val ref: DatabaseReference = database.getReference("usuario")
-
-            ref.child(fireUser!!.uid).addListenerForSingleValueEvent( //Coleta os dados do banco
-                object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            usuario = dataSnapshot.getValue(Usuario::class.java)
-                            Log.d(TAG_USUARIO, usuario.toString())
-                            preferencias.setUsuario(usuario!!)
-                            getFotoUri(fireUser.uid, preferencias)
-                        }
-                    }
-
-                    override fun onCancelled(dataSnapshot: DatabaseError) {
-                        Log.d(TAG_USUARIO, "Usuario não recuperado")
-                    }
+            usuarioDao.getUsuario(object: UsuarioCallback{
+                override fun onCallbackUsuarioDao() {
                 }
-            )
+
+                override fun onCallbackgetUsuario(usuario: Usuario) {
+                    preferencias.setUsuario(usuario)
+                    goToMainActivity()
+                }
+
+                override fun onCallbackUploadFoto(fotoUri: String) {}
+
+                override fun onError(men: String) {}
+
+            })
         } else if (provider == FACEBOOK) {
             var facebookUserId = ""
             val fotoUrl: String
@@ -196,21 +181,6 @@ class LoginActivity : AppCompatActivity() {
             preferencias.setUsuario(usuario)
             preferencias.setProvider(FACEBOOK)
             goToMainActivity()
-        }
-    }
-
-    private fun getFotoUri(userID: String, preferencias: Preferencias) {
-        val storage: FirebaseStorage = FirebaseStorage.getInstance()
-        val ref: StorageReference = storage.getReference("img_usuario").child(userID)
-        ref.downloadUrl.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                preferencias.setFoto(task.result.toString())
-                Log.d(TAG_PHOTO, "Sucesso ${task.result.toString()}")
-                goToMainActivity()
-            } else {
-                Log.d(TAG_PHOTO, "Falhou ${task.exception}")
-                goToMainActivity()
-            }
         }
     }
 

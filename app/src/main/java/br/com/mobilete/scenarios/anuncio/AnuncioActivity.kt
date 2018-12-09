@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.anuncio
 
 import android.location.Address
 import android.location.Geocoder
@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import br.com.mobilete.R
 import br.com.mobilete.entities.Anuncio
 import br.com.mobilete.entities.AppConstants
 import br.com.mobilete.entities.AppConstants.ANUNCIO

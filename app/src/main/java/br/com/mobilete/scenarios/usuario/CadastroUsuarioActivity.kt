@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.usuario
 
 import android.Manifest
 import android.app.Activity
@@ -15,6 +15,9 @@ import android.view.View
 import android.widget.ImageView
 import kotlinx.android.synthetic.main.activity_cadastro_usuario.*
 import android.view.MenuItem
+import br.com.mobilete.BuildConfig
+import br.com.mobilete.scenarios.main.MainActivity
+import br.com.mobilete.R
 import br.com.mobilete.daos.UsuarioDAO
 import br.com.mobilete.entities.AppConstants
 import br.com.mobilete.entities.AppConstants.REQUEST_CAMERA
@@ -114,6 +117,8 @@ class CadastroUsuarioActivity : AppCompatActivity() {
 
                 override fun onCallbackUploadFoto(fotoUri: String){}
 
+                override fun onCallbackgetUsuario(usuario: Usuario) {}
+
             })
         }else
             progressWheel(false)
@@ -132,6 +137,8 @@ class CadastroUsuarioActivity : AppCompatActivity() {
 
             override fun onCallbackUsuarioDao() {}
 
+            override fun onCallbackgetUsuario(usuario: Usuario) {}
+
         })
     }
 
@@ -148,6 +155,8 @@ class CadastroUsuarioActivity : AppCompatActivity() {
             }
 
             override fun onCallbackUploadFoto(fotoUri: String) {}
+
+            override fun onCallbackgetUsuario(usuario: Usuario) {}
 
         })
     }

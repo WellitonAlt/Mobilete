@@ -29,7 +29,7 @@
         </provider>
 
         <activity
-                android:name=".MainActivity"
+                android:name=".scenarios.main.MainActivity"
                 android:label="Mobilete"
                 android:theme="@style/AppThemeNoActionBar">
         </activity>
@@ -42,7 +42,7 @@
                 android:value="AIzaSyCSI878skniY0K4OdhOkKD9SPoIuDNgqGw"/>
 
         <activity
-                android:name=".LoginActivity"
+                android:name=".scenarios.usuario.LoginActivity"
                 android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
                 android:label="@string/app_name"
                 android:theme="@style/AppThemeNoActionBar">
@@ -68,27 +68,27 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".CadastroUsuarioActivity"
+                android:name=".scenarios.usuario.CadastroUsuarioActivity"
                 android:label="Mobilete - Novo Usuário">
         </activity>
         <activity
-                android:name=".CadastroAnuncioActivity"
+                android:name=".scenarios.anuncio.CadastroAnuncioActivity"
                 android:label="Mobilete - Anúncio">
         </activity>
         <activity
-                android:name=".MapaActivity"
+                android:name=".scenarios.anuncio.MapaActivity"
                 android:label="Mobilete - Mapa">
         </activity>
         <activity
-                android:name=".MeusAnunciosActivity"
+                android:name=".scenarios.anuncio.MeusAnunciosActivity"
                 android:label="Mobilete - Meus Anuncios">
         </activity>
         <activity
-                android:name=".AnuncioActivity"
+                android:name=".scenarios.anuncio.AnuncioActivity"
                 android:label="Mobilete - Anuncios">
         </activity>
         <activity
-                android:name=".SobreActivity"
+                android:name=".scenarios.sobre.SobreActivity"
                 android:label="Sobre">
         </activity>
     </application>

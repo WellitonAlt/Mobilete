@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.anuncio
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import br.com.mobilete.R
 import br.com.mobilete.entities.AppConstants.REQUEST_LOCATION
 import br.com.mobilete.entities.AppConstants.REQUEST_PLACE_PICKER
 import br.com.mobilete.entities.AppConstants.TAG_LOC
@@ -25,8 +26,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import java.io.IOException
-import com.google.android.gms.maps.CameraUpdateFactory
-
 
 
 class MapaActivity : AppCompatActivity(), OnMapReadyCallback {

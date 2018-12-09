@@ -1,4 +1,4 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.anuncio
 
 import android.Manifest
 import android.app.Activity
@@ -17,17 +17,15 @@ import android.support.v4.content.FileProvider
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Toast
+import br.com.mobilete.BuildConfig
+import br.com.mobilete.R
 import br.com.mobilete.callbacks.AnuncioCallback
 import br.com.mobilete.daos.AnuncioDAO
 import br.com.mobilete.entities.AppConstants.ANUNCIO
 import br.com.mobilete.entities.AppConstants.REQUEST_CAMERA
 import br.com.mobilete.entities.AppConstants.REQUEST_GALERIA
 import br.com.mobilete.entities.AppConstants.REQUEST_LOCATION
-import br.com.mobilete.entities.AppConstants.TAG_CAD
-import br.com.mobilete.entities.AppConstants.TAG_UP
 import br.com.mobilete.entities.Anuncio
 import br.com.mobilete.entities.AppConstants
 import br.com.mobilete.utils.GlideApp
@@ -35,10 +33,6 @@ import br.com.mobilete.utils.Mensagens
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_cadastro_anuncio.*
 import java.io.File
 import java.io.IOException
@@ -213,6 +207,8 @@ class CadastroAnuncioActivity : AppCompatActivity() {
                     progressWheel(false)
                 }
 
+                override fun onCallbackAnuncios(anuncios: MutableList<Anuncio>) {}
+
                 override fun onCallbackAnuncioDao() {}
             })
         }else
@@ -230,6 +226,9 @@ class CadastroAnuncioActivity : AppCompatActivity() {
                 progressWheel(false)
             }
             override fun onCallbackUploadFoto(fotoUri: String) {}
+
+            override fun onCallbackAnuncios(anuncios: MutableList<Anuncio>) {}
+
         })
     }
 
@@ -251,6 +250,9 @@ class CadastroAnuncioActivity : AppCompatActivity() {
                         Mensagens.mensagem(this@CadastroAnuncioActivity, men)
                     }
                     override fun onCallbackAnuncioDao() {}
+
+                    override fun onCallbackAnuncios(anuncios: MutableList<Anuncio>) {}
+
                 })
             } else
                 salvaAnuncio(anuncioDao)

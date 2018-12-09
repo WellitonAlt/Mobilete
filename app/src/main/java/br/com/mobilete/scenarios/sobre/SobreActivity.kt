@@ -1,13 +1,12 @@
-package br.com.mobilete
+package br.com.mobilete.scenarios.sobre
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.MenuItem
-import android.widget.TextView
+import br.com.mobilete.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_sobre.*
-import kotlinx.android.synthetic.main.anuncios_lista.view.*
 import me.grantland.widget.AutofitHelper
 
 class SobreActivity : AppCompatActivity() {
