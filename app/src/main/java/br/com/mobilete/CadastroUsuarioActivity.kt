@@ -13,32 +13,22 @@ import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import android.view.View
 import android.widget.ImageView
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_cadastro_usuario.*
-import android.widget.Toast
-import android.util.Log
 import android.view.MenuItem
-import android.widget.EditText
+import br.com.mobilete.daos.UsuarioDAO
 import br.com.mobilete.entities.AppConstants
 import br.com.mobilete.entities.AppConstants.REQUEST_CAMERA
 import br.com.mobilete.entities.AppConstants.REQUEST_GALERIA
-import br.com.mobilete.entities.AppConstants.TAG_AUTH
-import br.com.mobilete.entities.AppConstants.TAG_CAD
-import br.com.mobilete.entities.AppConstants.TAG_UP
 import br.com.mobilete.entities.Usuario
+import br.com.mobilete.callbacks.UsuarioCallback
 import br.com.mobilete.utils.GlideApp
+import br.com.mobilete.utils.Mensagens
 import br.com.mobilete.utils.Preferencias
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.*
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import java.io.File
 
 
 class CadastroUsuarioActivity : AppCompatActivity() {
 
-    private var mAuth: FirebaseAuth? = null
-    private var user: FirebaseUser? = null
     private var usuario : Usuario? = null
     private var fotoCamera: Uri? = null
     private var fotoAceita: Uri? = null
@@ -49,9 +39,6 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         setContentView(R.layout.activity_cadastro_usuario)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        //Firebase
-        mAuth = FirebaseAuth.getInstance()
 
         dialog = ProgressDialog(this, R.style.ProgressDialogStyle) //Inicia o Progress Dialog
         dialog.setMessage("Salvando...")
@@ -93,13 +80,13 @@ class CadastroUsuarioActivity : AppCompatActivity() {
             }
         }
 
-        if(requestCode == REQUEST_CAMERA && resultCode == Activity.RESULT_OK){
+        if (requestCode == REQUEST_CAMERA && resultCode == Activity.RESULT_OK) {
             fotoAceita = fotoCamera
             carregaFoto()
         }
     }
 
-    private fun cadastraUsuaio(){
+    private fun cadastraUsuaio() {
         progressWheel(true)
         if (validaCampos()) {
             usuario = Usuario(
@@ -107,30 +94,84 @@ class CadastroUsuarioActivity : AppCompatActivity() {
                 edtEmail.text.toString(),
                 edtTelefone.text.toString()
             )
-            criaAutenticadorEmailSenha(usuario, edtSenha.text.toString())
+            val usuarioDao = UsuarioDAO(usuario!!, edtSenha.text.toString())
+            usuarioDao.criaAutenticadorEmailSenha(object: UsuarioCallback {
+                override fun onCallbackUsuarioDao() {
+                    if (fotoAceita != null) {
+                        usuarioDao.fotoUri = fotoAceita
+                        uploadFoto(usuarioDao)
+                    }
+                    else {
+                        setUsuarioPreferencia()
+                        goToMainActivity()
+                    }
+                }
+
+                override fun onError(men: String) {
+                    Mensagens.mensagem(this@CadastroUsuarioActivity, men)
+                    progressWheel(false)
+                }
+
+                override fun onCallbackUploadFoto(fotoUri: String){}
+
+            })
         }else
             progressWheel(false)
+    }
+
+    private fun uploadFoto(usuarioDao: UsuarioDAO) {
+        usuarioDao.uploadFoto(object : UsuarioCallback {
+            override fun onCallbackUploadFoto(fotoUri: String) {
+                usuario!!.foto = fotoUri
+                editaUsario(usuarioDao)
+            }
+
+            override fun onError(men: String) {
+                Mensagens.mensagem(this@CadastroUsuarioActivity, men)
+                progressWheel(false)
+            }
+
+            override fun onCallbackUsuarioDao() {}
+
+        })
+    }
+
+    private fun editaUsario(usuarioDao: UsuarioDAO) {
+        usuarioDao.editaUsuario(object : UsuarioCallback {
+            override fun onCallbackUsuarioDao() {
+                setUsuarioPreferencia()
+                goToMainActivity()
+            }
+
+            override fun onError(men: String) {
+                Mensagens.mensagem(this@CadastroUsuarioActivity, men)
+                progressWheel(false)
+            }
+
+            override fun onCallbackUploadFoto(fotoUri: String) {}
+
+        })
     }
 
     private fun validaCampos(): Boolean {
 
         if (edtNome.text.isEmpty()) {
-            mensagemErro("O campo nome deve conter informação!!", edtNome)
+            Mensagens.mensagemFocus(this, "O campo nome deve conter informação!!", edtNome)
             return false
         }else if (!emailValido(edtEmail.text.toString())) {
-            mensagemErro("O campo email está fora do padrão!!", edtEmail)
+            Mensagens.mensagemFocus(this,"O campo email está fora do padrão!!", edtEmail)
             return false
         }else if (edtEmail.text.isEmpty()) {
-            mensagemErro("O campo email deve conter informação!!", edtEmail)
+            Mensagens.mensagemFocus(this,"O campo email deve conter informação!!", edtEmail)
             return false
         } else if (edtTelefone.text.isEmpty()) {
-            mensagemErro("O campo telefone deve conter informação!!", edtTelefone)
+            Mensagens.mensagemFocus(this,"O campo telefone deve conter informação!!", edtTelefone)
             return false
         } else if (edtSenha.text.isEmpty()) {
-            mensagemErro("O campo senha deve conter informação!!", edtSenha)
+            Mensagens.mensagemFocus(this,"O campo senha deve conter informação!!", edtSenha)
             return false
         } else if (edtSenha.text.length < 6) {
-            mensagemErro("O campo senha deve conter mais de 6 carateres!!", edtSenha)
+            Mensagens.mensagemFocus(this,"O campo senha deve conter mais de 6 carateres!!", edtSenha)
             return false
         }
         return true
@@ -140,65 +181,15 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    private fun criaAutenticadorEmailSenha(usuario: Usuario?, senha: String){
-        mAuth!!.createUserWithEmailAndPassword(usuario!!.email, senha)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG_AUTH, "Sucesso")
-                    user = mAuth!!.currentUser
-                    if(fotoAceita != null)
-                        uploadFoto(user!!, fotoAceita!!)
-                    criaUsuario(user!!, usuario)
-                } else {
-                    Log.d(TAG_AUTH, "Falhou ${task.exception}")
-                    mensagemErro("Email já cadastrado ou invalido!!")
-                    progressWheel(false)
-                }
-            }
-    }
-
-    private fun criaUsuario(fireUser: FirebaseUser, usuario: Usuario){
-        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val ref: DatabaseReference = database.getReference("usuario").child(fireUser.uid)
-        ref.setValue(usuario)
-            .addOnCompleteListener(this){ task ->
-                if (task.isSuccessful){
-                    Log.d(TAG_CAD, "Sucesso")
-                    getUsuario()
-                }else{
-                    Log.d(TAG_CAD, "Falhou ${task.exception}")
-                    mensagemErro("Ocorreu um erro ao salvar no banco de dados!!")
-                    progressWheel(false)
-                }
-        }
+    private fun setUsuarioPreferencia(){
+        val preferencias = Preferencias(this)
+        preferencias.setUsuario(usuario!!)
     }
 
     private fun goToMainActivity(){
         val goToMain= Intent(this, MainActivity::class.java)
         startActivity(goToMain)
         finish()
-    }
-
-    private fun uploadFoto(fireUser: FirebaseUser, fotoURI: Uri) {
-        val storage: FirebaseStorage = FirebaseStorage.getInstance()
-        val ref: StorageReference = storage.getReference("img_usuario").child(fireUser.uid)
-        ref.putFile(fotoURI)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG_UP, "Sucesso")
-                } else {
-                    Log.d(TAG_UP, "Falhou ${task.exception}")
-                    mensagemErro("Ocorreu um erro ao fazer upload da imagem!!")
-                }
-            }
-    }
-
-    private fun getUsuario(){
-        val preferencias = Preferencias(this)
-        if (fotoAceita!= null)
-            usuario!!.foto = fotoAceita.toString()
-        preferencias.setUsuario(usuario!!)
-        goToMainActivity()
     }
 
     private fun tiraFoto() {
@@ -210,12 +201,12 @@ class CadastroUsuarioActivity : AppCompatActivity() {
             tirarFoto.putExtra(MediaStore.EXTRA_OUTPUT, uriFoto)
             startActivityForResult(tirarFoto, REQUEST_CAMERA)
         } else {
-            mensagemErro("Impossível tirar foto")
+            Mensagens.mensagem(this,"Impossível tirar foto")
         }
     }
 
     private fun montaArquivoFoto(): File {
-        val nomeArquivo = mAuth!!.uid + "_" +System.currentTimeMillis().toString()
+        val nomeArquivo = System.currentTimeMillis().toString()
         val diretorioArquivo = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val arquivoFoto = File.createTempFile(nomeArquivo, "jpg", diretorioArquivo)
 
@@ -231,15 +222,6 @@ class CadastroUsuarioActivity : AppCompatActivity() {
         if (selecionaFoto.resolveActivity(packageManager) != null) {
             startActivityForResult(selecionaFoto, REQUEST_GALERIA)
         }
-    }
-
-    private fun mensagemErro(mensagem: String, editText: EditText){
-        editText.error =mensagem
-        editText.requestFocus()
-    }
-
-    private fun mensagemErro(mensagem: String){
-        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show()
     }
 
     private fun progressWheel(enabled: Boolean) {

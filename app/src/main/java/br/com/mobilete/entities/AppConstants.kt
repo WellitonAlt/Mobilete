@@ -33,5 +33,8 @@ object AppConstants{
     const val MEUS_ANUNCIO: String = "MeusAnuncio"
     const val SOBRE: String = "Sobre"
 
+    const val PATH_USUARIO: String = "usuarios"
+    const val PATH_IMG_USUARIO: String = "img_usuarios"
+
 
 }
