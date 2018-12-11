@@ -89,7 +89,15 @@
         </activity>
         <activity
                 android:name=".scenarios.sobre.SobreActivity"
-                android:label="Sobre">
+                android:label="Mobilete - Sobre">
+        </activity>
+        <activity
+                android:name=".scenarios.usuario.PerfilActivity"
+                android:label="Mobilete - Perfil">
+        </activity>
+        <activity
+                android:name=".scenarios.anuncio.BuscaActivity"
+                android:label="Mobilete - Busca">
         </activity>
     </application>
 

@@ -8,6 +8,7 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -23,11 +24,11 @@ import br.com.mobilete.callbacks.AnuncioCallback
 import br.com.mobilete.daos.AnuncioDAO
 import br.com.mobilete.scenarios.sobre.SobreActivity
 import br.com.mobilete.entities.Anuncio
-import br.com.mobilete.scenarios.anuncio.AnuncioActivity
-import br.com.mobilete.scenarios.anuncio.AnuncioAdapter
-import br.com.mobilete.scenarios.anuncio.CadastroAnuncioActivity
-import br.com.mobilete.scenarios.anuncio.MeusAnunciosActivity
+import br.com.mobilete.entities.AppConstants.BUSCA
+import br.com.mobilete.entities.AppConstants.PERFIL
+import br.com.mobilete.scenarios.anuncio.*
 import br.com.mobilete.scenarios.usuario.LoginActivity
+import br.com.mobilete.scenarios.usuario.PerfilActivity
 import br.com.mobilete.utils.Preferencias
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -37,11 +38,6 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-        private const val REQUEST_CADASTRO: Int = 1
-        private const val LISTA = "ListaAnuncuis"
-    }
 
     private var listaAnuncios: MutableList<Anuncio> = mutableListOf()
     private var mAuth: FirebaseAuth? = null
@@ -75,8 +71,7 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val preferencias = Preferencias(this)
-
+       val preferencias = Preferencias(this)
         navigationView.setNavigationItemSelectedListener {
             when {
                 it.itemId == R.id.opCriaAnuncio -> {
@@ -105,6 +100,31 @@ class MainActivity : AppCompatActivity() {
 
         val navView: NavigationView = findViewById(R.id.navigationView)
         val navHeader: View = navView.getHeaderView(0)
+        val imgPerfil: ImageView = navHeader.findViewById(R.id.imgPerfil)
+
+        carregaNavBar()
+
+       imgPerfil.setOnClickListener{
+           goToActivity(PERFIL)
+       }
+
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_mapa, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        carregaNavBar()
+    }
+
+    private fun carregaNavBar(){
+        val preferencias = Preferencias(this)
+        val navView: NavigationView = findViewById(R.id.navigationView)
+        val navHeader: View = navView.getHeaderView(0)
         val txtNome: TextView = navHeader.findViewById(R.id.txtNomeNav)
         val txtEmail: TextView = navHeader.findViewById(R.id.txtEmailNav)
         val imgPerfil: ImageView = navHeader.findViewById(R.id.imgPerfil)
@@ -113,14 +133,14 @@ class MainActivity : AppCompatActivity() {
 
         if (preferencias.getFoto() != ""){
             Glide.with(this)
-              .load(preferencias.getFoto())
-              .apply(RequestOptions.circleCropTransform())
-              .into(imgPerfil)
+                .load(preferencias.getFoto())
+                .apply(RequestOptions.circleCropTransform())
+                .into(imgPerfil)
         }else {
             Glide.with(this)
-               .load(R.drawable.person)
-               .apply(RequestOptions.circleCropTransform())
-               .into(imgPerfil)
+                .load(R.drawable.person)
+                .apply(RequestOptions.circleCropTransform())
+                .into(imgPerfil)
         }
     }
 
@@ -133,6 +153,8 @@ class MainActivity : AppCompatActivity() {
             ANUNCIO -> startActivity(Intent(this, CadastroAnuncioActivity::class.java))
             MEUS_ANUNCIO -> startActivity(Intent(this, MeusAnunciosActivity::class.java))
             SOBRE -> startActivity(Intent(this, SobreActivity::class.java))
+            PERFIL -> startActivity(Intent(this, PerfilActivity::class.java))
+            BUSCA -> startActivity(Intent(this, BuscaActivity::class.java))
         }
 
     }
@@ -140,6 +162,10 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (toggle.onOptionsItemSelected(item)) {
             return true
+        }
+
+        when(item!!.itemId){
+            R.id.menuProcurar -> goToActivity(BUSCA)
         }
         return super.onOptionsItemSelected(item)
     }

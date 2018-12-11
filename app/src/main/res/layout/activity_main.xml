@@ -24,6 +24,17 @@
                     app:title="@string/tituloApp"
                     app:titleTextColor="@android:color/white"/>
 
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="90dp"
+                    android:background="@drawable/retangulo_trans"
+                    android:text="@string/anuncios_interessantes"
+                    android:gravity="center"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+            />
+
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/rvAnuncios"
                     android:layout_width="match_parent"

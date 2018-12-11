@@ -15,6 +15,7 @@ object AppConstants{
     const val TAG_AUTH: String = "FirebaseLog - Cria Autenticação"
     const val TAG_USUARIO: String = "FirebaseLog - Recupera Usuario"
     const val TAG_PHOTO: String = "FirebaseLog - Recupera Foto"
+    const val TAG_TAG: String = "FirebaseLog - Recupera TAGS"
     const val TAG_ANUNCIO: String = "FirebaseLog - Recupera Anuncios"
     const val TAG_ANUNCIO_DELETE: String = "FirebaseLog - Deleta Anuncios"
     const val TAG_ANUNCIO_FOTO: String = "FirebaseLog - Deleta Anuncios Foto"
@@ -32,11 +33,13 @@ object AppConstants{
     const val ANUNCIO: String = "Anuncio"
     const val MEUS_ANUNCIO: String = "MeusAnuncio"
     const val SOBRE: String = "Sobre"
+    const val PERFIL: String = "Perfil"
+    const val BUSCA: String = "Busca"
 
     const val PATH_USUARIO: String = "usuarios"
     const val PATH_ANUNCIO: String = "anuncios"
+    const val PATH_TAG: String = "tags"
+    const val PATH_USUARIO_TAG: String = "usuario_tag"
     const val PATH_IMG_USUARIO: String = "img_usuarios"
     const val PATH_IMG_ANUNCIO: String = "img_anuncios"
-
-
 }

@@ -73,6 +73,9 @@ dependencies {
     //AutoFitTextView
     implementation 'me.grantland:autofittextview:0.2.0'
 
+    //Clips
+    implementation 'com.anton46:collection-picker:1.0.2'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

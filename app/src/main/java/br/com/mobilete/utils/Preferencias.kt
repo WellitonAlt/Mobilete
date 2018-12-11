@@ -73,4 +73,12 @@ class Preferencias(context: Context) {
         setTelefone(usuario.telefone)
         setFoto(usuario.foto)
     }
+
+    fun getUsuario(): Usuario{
+        var usuario = Usuario(preferencias.getString(PRE_NOME, "")!!,
+            preferencias.getString(PRE_EMAIL, "")!!,
+            preferencias.getString(PRE_TELEFONE, "")!!,
+            preferencias.getString(PRE_FOTO, "")!!)
+        return usuario
+    }
 }
